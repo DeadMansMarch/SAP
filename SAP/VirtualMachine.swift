@@ -14,9 +14,14 @@ class VirtualMachine{
     private(set) var AccessMem = [Int](); //'Memory'.
     private(set) var AccessReg = [Int](); //Registers.
     private(set) var SpReg = ["PGRM":0,"CMPR":0,"STCK":0]; //Special Registers.
+    //                                  ^ 0 = less, 1 = equal, 2 = great.
     
     func setMemoryLength(Length L:Int){ //Resets memory to certain size.
         AccessMem = [Int](repeating:0,count:8);
+    }
+    
+    func loadMem(FullMem Dat:[Int]){
+        self.setMemoryLength(Length: Dat[0]);
     }
     
     func cmdSwitch(With c:Int){ //Get command from Int.
@@ -42,7 +47,9 @@ class VirtualMachine{
             case 55: //outs.
                 break;
             case 57: //jumpne
-                SpReg["PGRM"] = AccessMem[SpReg["PGRM"]! + 1]; //Set PGRM counter to location in memory : PGRM + 1
+                if (SpReg["CMPR"] != 1){ //Not equal.
+                    SpReg["PGRM"] = AccessMem[SpReg["PGRM"]! + 1]; //Set PGRM counter to location in memory : PGRM + 1
+                }
                 break;
             default:
                 break;
