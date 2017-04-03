@@ -8,5 +8,5 @@
 
 import Foundation
 
-print("Hello, World!")
+print("God Tier Overwrite test.");
 
