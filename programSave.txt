@@ -1,0 +1,7 @@
+    .Start Test
+
+Begin: .Integer #20 ;End of Doubles to Print.
+End:            .Integer #20 ;End of Doubles to Print
+NewLine:        .Integer #10 ;Ascii for new line.
+IntroMess:       .String "A Program To Print Doubles"
+DoubleMess:      .String " Doubled is "

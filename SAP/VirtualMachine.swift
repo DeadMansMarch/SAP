@@ -165,14 +165,14 @@ class VirtualMachine{
                     print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
-                print(Character(UnicodeScalar(Registers[Parameters[0]])!));
+                print(Character(UnicodeScalar(Registers[Parameters[0]])!),terminator:"");
                 break;
             case 49: //printi
                 guard checkRegister(Parameters[0]) else{
                     print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
-                print(Registers[Parameters[0]]);
+                print(Registers[Parameters[0]],terminator:"");
                 break;
             case 55: //outs.
                 guard checkMemoryLocation(Parameters[0]) else{
@@ -180,7 +180,7 @@ class VirtualMachine{
                     break;
                 }
                 let Str = RAM[Parameters[0] + 1...(Parameters[0] + 2 + RAM[Parameters[0]])]; //Get the string as an array of ints.
-                print(Str.map{String(Character(UnicodeScalar($0)!))}.reduce("",+))
+                print(Str.map{String(Character(UnicodeScalar($0)!))}.reduce("",+),terminator:"")
                 break;
             case 57: //jumpne
                 if (SpRegisters["CMPR"]! != 1){ //Not equal.

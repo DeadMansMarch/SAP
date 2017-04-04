@@ -19,6 +19,12 @@ class Assembler{
     }
     
     func Assemble(){
+        guard let PGRM = self.program else{
+            print("FATAL ASSEMBLY ERROR : No Program Loaded.")
+            return;
+        }
+        
+        let Lines = PGRM.characters.split(separator: "\n");
         
     }
 }
