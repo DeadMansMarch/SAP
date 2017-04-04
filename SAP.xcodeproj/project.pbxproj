@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2828B25E1E933EE10092FB20 /* saveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2828B25D1E933EE10092FB20 /* saveFile.swift */; };
+		2828B2601E9340110092FB20 /* saveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2828B25F1E9340110092FB20 /* saveFile.swift */; };
 		2869D2201E92C138007D273F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D21F1E92C138007D273F /* main.swift */; };
 		2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D2261E92C456007D273F /* VirtualMachine.swift */; };
 /* End PBXBuildFile section */
@@ -25,7 +25,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2828B25D1E933EE10092FB20 /* saveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = saveFile.swift; path = ../saveFile.swift; sourceTree = "<group>"; };
+		2828B25F1E9340110092FB20 /* saveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = saveFile.swift; sourceTree = "<group>"; };
 		2869D21C1E92C138007D273F /* SAP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SAP; sourceTree = BUILT_PRODUCTS_DIR; };
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 		2869D21E1E92C138007D273F /* SAP */ = {
 			isa = PBXGroup;
 			children = (
-				2828B25D1E933EE10092FB20 /* saveFile.swift */,
+				2828B25F1E9340110092FB20 /* saveFile.swift */,
 				2869D21F1E92C138007D273F /* main.swift */,
 				2869D2261E92C456007D273F /* VirtualMachine.swift */,
 			);
@@ -127,7 +127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2869D2201E92C138007D273F /* main.swift in Sources */,
-				2828B25E1E933EE10092FB20 /* saveFile.swift in Sources */,
+				2828B2601E9340110092FB20 /* saveFile.swift in Sources */,
 				2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
