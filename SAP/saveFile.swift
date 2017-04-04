@@ -19,6 +19,11 @@ class saveFile{
         url = URL.init(fileURLWithPath: "\(Documents.path)/\(n).txt");
     }
     
+    init(withUrl u:URL){
+        self.Name = u.path;
+        self.url = u;
+    }
+    
     public func write(Data:String)->String?{ //Writes a full file, full override.
         
         do{
