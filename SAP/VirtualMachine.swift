@@ -47,8 +47,11 @@ class VirtualMachine{
         while true{
             let PG = SpReg["PGRM"]!;
             let Command = AccessMem[PG];
-            cmdSwitch(With:Command);
-            if PG == SpReg["PGRM"]!{
+            if cmdSwitch(With:Command){
+                if PG == SpReg["PGRM"]!{
+                    break;
+                }
+            }else{
                 break;
             }
         }
@@ -61,7 +64,7 @@ class VirtualMachine{
     func moveBy(Inputs:Int)->[Int]{ //Return inputs and move PGRM counter.
         var Options = [Int]();
         let PG = SpReg["PGRM"]!
-        guard PG == AccessMem.count else{
+        guard PG <= AccessMem.count else{
             print("OVERFLOW ERROR");
             return [Int]();
         }
@@ -70,22 +73,22 @@ class VirtualMachine{
         for i in 1...Inputs{
             Options.append(getValue(for:PG + i));
         }
-        print(Options)
         return Options;
     }
     
-    func cmdSwitch(With c:Int){ //Get command from Int.
-        
+    func cmdSwitch(With c:Int)->Bool{ //Get command from Int.
+        guard c != 0 else{
+            print("Program finished.")
+            return false;
+        }
         guard let nOpt = Options[c] else{
             print("FATAL ERROR.");
-            return;
+            return false;
         }
         
         let oSet = moveBy(Inputs:nOpt);
         
         switch(c){
-            case 0:
-                break;
             case 1:
                 break;
             case 2:
@@ -114,7 +117,7 @@ class VirtualMachine{
                 }
                 break;
             case 45: //outcr.
-                print(AccessReg[oSet[0]]);
+                print(Character(UnicodeScalar(AccessReg[oSet[0]])!));
                 break;
             case 49: //printi
                 print(AccessReg[oSet[0]]);
@@ -136,6 +139,7 @@ class VirtualMachine{
                 print("\(c) : Not found in listings.");
                 break;
         }
+        return true;
     }
     
 }
