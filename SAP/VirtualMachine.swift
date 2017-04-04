@@ -13,14 +13,62 @@ class VirtualMachine{
     //Dis rih here a virtual machene.
     let NumOfParamsNeeded = [
         0:0,
+        1:1,
+        2:1,
+        3:1,
+        4:2,
+        5:2,
         6:2,
+        7:2,
         8:2,
+        9:2,
+        10:2,
+        11:3,
         12:2,
         13:2,
+        14:2,
+        15:2,
+        16:2,
+        17:2,
+        18:2,
+        19:2,
+        20:2,
+        21:2,
+        22:2,
+        23:2,
+        24:2,
+        25:2,
+        26:2,
+        27:2,
+        28:1,
+        29:2,
+        30:2,
+        31:2,
+        32:2,
+        33:2,
         34:2,
+        35:2,
+        36:1,
+        37:1,
+        38:1,
+        39:1,
+        40:0,
+        41:1,
+        42:1,
+        43:1,
+        44:1,
         45:1,
+        46:1,
+        47:2,
+        48:2,
         49:1,
+        50:1,
+        51:2,
+        52:0,
+        53:2,
+        54:2,
         55:1,
+        56:0,
         57:1
     ];
     private(set) var RAMArray = [Int](); //'Memory'.
@@ -34,11 +82,10 @@ class VirtualMachine{
     }
     
     func loadMem(FullMem Data:[Int]){
-        self.setMemoryLength(Length: Data[0]); //Set memory length.
+        self.setMemoryLength(Length: 1000); //Set memory length.
         SpecialRegisters["PGRM"] = Data[1];               //Set program counter to initial position.
-        
-        for i in 0..<Data[0]{
-            RAMArray[i] = Data[i + 2];        //Fill Memory.
+        for i in 2..<Data.count{
+            RAMArray[i-2] = Data[i];        //Fill Memory.
         }
     }
     func checkRegister(_ rNum:Int)->Bool{
@@ -87,7 +134,7 @@ class VirtualMachine{
             return false;
         }
         guard let NumRAMLocationsInvolved = NumOfParamsNeeded[c] else{
-            print("FATAL ERROR: COMMAND NOT RECOGNIZED");
+            print("FATAL ERROR: COMMAND NOT RECOGNIZED: \(c) PC: \(SpecialRegisters["PGRM"]!)");
             return false;
         }
         let Paremeters = movePC_GetParams(Amount:NumRAMLocationsInvolved);
@@ -138,6 +185,24 @@ class VirtualMachine{
                 }
                 RegistersArray[Paremeters[1]] = RegistersArray[Paremeters[1]] + RegistersArray[Paremeters[0]];
                 break;
+            case 28://jmp
+                guard checkMemoryLocation(Paremeters[0]) else {
+                    print("FATAL ERROR ILLEGAL MEMORY LOCATION: \(Paremeters[0]) PC: \(SpecialRegisters["PGRM"]!)")
+                    break;
+                }
+                SpecialRegisters["PGRM"]=Paremeters[0]
+            case 33:
+                guard checkRegister(Paremeters[1]) else{
+                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Paremeters[1]) PC: \(SpecialRegisters["PGRM"]!)")
+                    break;
+                }
+                if Paremeters[0] > RegistersArray[Paremeters[1]]{
+                    SpecialRegisters["CMPR"] = 2;
+                }else if Paremeters[0] < RegistersArray[Paremeters[1]]{
+                    SpecialRegisters["CMPR"] = 0;
+                }else{
+                    SpecialRegisters["CMPR"] = 1;
+                }
             case 34: //cmprr.
                 guard checkRegister(Paremeters[0]) else{
                     print("FATAL ERROR: ILLEGAL REGISTER #: \(Paremeters[0]) PC: \(SpecialRegisters["PGRM"]!)")
