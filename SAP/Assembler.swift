@@ -117,11 +117,7 @@ class Assembler{
             let Command = Options[0];
             
             if let cmdInt = commandListing[Command]{
-                if Data.count == 56{
-                    print(cmdInt)
-                    print(Command);
-                    print(CInd);
-                }
+
                 Data.append(cmdInt);
                 if Options.count > 1{
                     for i in 1...Options.count - 1{ //For each option.
@@ -148,16 +144,13 @@ class Assembler{
                     pointers[String(ColonBreaker[0]).lowercased()] = MemoryLocation;
                 }
             }else{
-                print(Command);
                 switch(Command){
                     case ".Integer":
                         guard Options.count > 1 else{
                             print("Error : .Integer takes at least 1 option.");
                             break;
                         }
-                        print(Options)
                         Data.append(Int(String(Options[1].characters.dropFirst()))!)
-                        
                         break;
                     case ".String":
                         guard Options.count > 1 else{
@@ -192,7 +185,7 @@ class Assembler{
                 for location in local {
                     Data[location] = v;
                 }
-            }else{
+            }else if startPointer != k{
                 print("Pointer not used : \(k)");
             }
         }
