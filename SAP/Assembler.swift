@@ -83,6 +83,7 @@ class Assembler{
     "jmpne":57]
     
     private(set) var pointers:[String:Int] = [:];
+    private(set) var pointerReplicate:[String:[Int]] = [:];
     private(set) var program:String? = "";
     
     func load(Program:String){
@@ -91,6 +92,7 @@ class Assembler{
     
     func Assemble()->[Int]{
         var Data = [Int]();
+        var startPointer:String = "";
         
         guard let PGRM = self.program else{
             print("FATAL ASSEMBLY ERROR : No Program Loaded.")
@@ -101,7 +103,8 @@ class Assembler{
         
         for Line in Lines{
             let ColonBreaker = Line.characters.split(separator: ":")
-            let CInd = 0 + ColonBreaker.count - 1;
+            let CInd = ColonBreaker.count - 1;
+            let MemoryLocation = Data.count;
             guard ColonBreaker.count <= 2 else{
                 print("Assebler error. Too many colons.");
                 return [Int]()
@@ -111,11 +114,39 @@ class Assembler{
                                                     .filter({!$0.isEmpty})
                                                     .map{String($0)};
             
-            
             let Command = Options[0];
             
             if let cmdInt = commandListing[Command]{
-                print(cmdInt)
+                if Data.count == 56{
+                    print(cmdInt)
+                    print(Command);
+                    print(CInd);
+                }
+                Data.append(cmdInt);
+                if Options.count > 1{
+                    for i in 1...Options.count - 1{ //For each option.
+                    
+                        if let asInt = Int(Options[i]){
+                            Data.append(asInt)
+                        }else if Options[i].characters.first == "r"{
+                            Data.append(Int(String(Options[i].characters.dropFirst()))!);
+                        }else if Options[i].characters.first == "#"{
+                            Data.append(Int(String(Options[i].characters.dropFirst()))!);
+                        }else{
+                            let LOW = Options[i].lowercased()
+                            if pointerReplicate[LOW] != nil{
+                                pointerReplicate[LOW]!.append(Data.count);
+                            }else{
+                                pointerReplicate[LOW] = [Data.count];
+                            }
+                            Data.append(0); //Append a placeholder to be replaced by the pointer on 2nd pass.
+                        }
+                    }
+                }
+            
+                if CInd > 0{
+                    pointers[String(ColonBreaker[0]).lowercased()] = MemoryLocation;
+                }
             }else{
                 print(Command);
                 switch(Command){
@@ -139,18 +170,37 @@ class Assembler{
                         STR.characters.map{let S = String($0).unicodeScalars; return Int(S[S.startIndex].value)}
                             .forEach({Data.append($0)});
                         
-                        
+                        break;
+                    case ".Start":
+                        print("Start established at location: \(Options[1].lowercased()).")
+                        startPointer = Options[1].lowercased();
                         break;
                     default:
                         break;
                 }
+                
+                if CInd > 0{
+                    pointers[String(ColonBreaker[0]).lowercased()] = MemoryLocation;
+                }
             }
-            print(Data);
             
             
         }
         
-        return [Int]();
+        for (k,v) in pointers{
+            if let local = pointerReplicate[k]{
+                for location in local {
+                    Data[location] = v;
+                }
+            }else{
+                print("Pointer not used : \(k)");
+            }
+        }
+        
+        Data.insert(Data.count, at: 0);
+        Data.insert(pointers[startPointer] ?? 0,at:1);
+        
+        return Data;
     }
 }
 
