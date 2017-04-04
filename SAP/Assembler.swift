@@ -169,6 +169,7 @@ class Assembler{
                         startPointer = Options[1].lowercased();
                         break;
                     default:
+                        print("This command did not exist.")
                         break;
                 }
                 

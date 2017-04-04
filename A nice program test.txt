@@ -1,0 +1,8 @@
+.Start Looperino
+
+TotalString: .String "The mitochondria is the powerhouse of the cell."
+
+
+Looperino: movir #0 r0
+doTheLoop: outs TotalString
+           jmp doTheLoop

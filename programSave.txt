@@ -25,6 +25,6 @@ Do01: movrr r8 r1
       outcr r0
       cmprr  r8 r9
     addir #1 r8
-      jmpne do01
+      jmpne Test
 wh01:  halt
     .end

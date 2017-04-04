@@ -31,6 +31,7 @@
 		2828B25F1E9340110092FB20 /* saveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = saveFile.swift; sourceTree = "<group>"; };
 		2828B2611E93CE540092FB20 /* Assembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assembler.swift; sourceTree = "<group>"; };
 		2828B2641E93D19D0092FB20 /* programSave.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = programSave.txt; path = ../programSave.txt; sourceTree = "<group>"; };
+		2828B2691E9437910092FB20 /* A nice program test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "A nice program test.txt"; sourceTree = SOURCE_ROOT; };
 		2869D21C1E92C138007D273F /* SAP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SAP; sourceTree = BUILT_PRODUCTS_DIR; };
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
@@ -51,6 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				2828B2641E93D19D0092FB20 /* programSave.txt */,
+				2828B2691E9437910092FB20 /* A nice program test.txt */,
 			);
 			name = Programs;
 			sourceTree = "<group>";

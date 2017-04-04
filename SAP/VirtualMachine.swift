@@ -11,18 +11,31 @@ import Foundation
 
 class VirtualMachine{
     //Dis rih here a virtual machene.
+
     let paramList = [
         0:0,
-        6:2,
-        8:2,
-        12:2,
-        13:2,
-        34:2,
+        1:1,
+        2:1,
+        3:1,
+        11:3,
+        28:1,
+        36:1,
+        37:1,
+        38:1,
+        39:1,
+        40:0,
+        41:1,
+        42:1,
+        43:1,
+        44:1,
         45:1,
+        46:1,
         49:1,
+        50:1,
+        52:0,
         55:1,
-        57:1
-    ];
+        56:0,
+        57:1]
     
     private(set) var RAM = [Int](); //'Memory'.
     private(set) var Registers = [Int](repeating:0,count:10); //Registers.
@@ -91,15 +104,25 @@ class VirtualMachine{
             return false;
         }
         
-        guard let nParam = paramList[c] else{
+        guard c > 0 && c <= 57 else{
             print("FATAL ERROR: COMMAND NOT RECOGNIZED");
             return false;
         }
+        
+        let nParam = paramList[c] || 2;
+        
         let Parameters = mPC(Amount:nParam);
         switch(c){
             case 1:
                 break;
             case 2:
+                break;
+            case 5: //moveir
+                Registers[Parameters[1]] = Parameters[0];
+                guard checkRegister(Parameters[1]) else {
+                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
+                    break;
+                }
                 break;
             case 6:  //moverr.
                 guard checkRegister(Parameters[0]) else{
