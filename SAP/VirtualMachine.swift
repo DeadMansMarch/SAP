@@ -109,7 +109,7 @@ class VirtualMachine{
             return false;
         }
         
-        let nParam = paramList[c] || 2;
+        let nParam = paramList[c] ?? 2;
         
         let Parameters = mPC(Amount:nParam);
         switch(c){
@@ -165,6 +165,22 @@ class VirtualMachine{
                     break;
                 }
                 Registers[Parameters[1]] = Registers[Parameters[1]] + Registers[Parameters[0]];
+                break;
+            case 28:
+                SpRegisters["PGRM"] = Parameters[0];
+                break;
+            case 33:
+                guard checkRegister(Parameters[1]) else{
+                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
+                    break;
+                }
+                if Parameters[0] > Registers[Parameters[1]]{
+                    SpRegisters["CMPR"] = 2;
+                }else if Parameters[0] < Registers[Parameters[1]]{
+                    SpRegisters["CMPR"] = 0;
+                }else{
+                    SpRegisters["CMPR"] = 1;
+                }
                 break;
             case 34: //cmprr.
                 guard checkRegister(Parameters[0]) else{
