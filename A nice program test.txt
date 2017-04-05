@@ -1,8 +1,13 @@
-.Start Looperino
+.Start Draw
 
-TotalString: .String "The mitochondria is the powerhouse of the cell."
+L1: .String "o        o"
+L2: .String "     \    "
+L3: .String "     _\   "
+L4: .String "    ___   "
 
-
-Looperino: movir #0 r0
-doTheLoop: outs TotalString
-           jmp doTheLoop
+Draw: outs L1
+        outs L2
+        outs L3
+        outs L4
+        halt
+        .end

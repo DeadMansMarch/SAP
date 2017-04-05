@@ -57,11 +57,19 @@ class VirtualMachine{
     }
     
     func checkRegister(_ rNum:Int)->Bool{
-        return 0..<10 ~= rNum
+        let check = 0..<10 ~= rNum
+        if (!check){
+            print("FATAL ERROR ILLEGAL REGISTER #: \(rNum) PC: \(SpRegisters["PGRM"]!)")
+        }
+        return check;
     }
     
     func checkMemoryLocation(_ label:Int)->Bool{
-        return 0..<RAM.count ~= label
+        let check = 0..<RAM.count ~= label
+        if (!check){
+            print("FATAL ERROR ILLEGAL MEMORY LOCATION: \(label) PC: \(SpRegisters["PGRM"]!)")
+        }
+        return check;
     }
     
     func Execute(){ //Executes the full program.
@@ -120,28 +128,31 @@ class VirtualMachine{
             case 5: //moveir
                 Registers[Parameters[1]] = Parameters[0];
                 guard checkRegister(Parameters[1]) else {
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 break;
             case 6:  //moverr.
                 guard checkRegister(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 guard checkRegister(Parameters[1]) else {
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 Registers[Parameters[1]]=Registers[Parameters[0]]
                 break;
+            case 7: //moverm
+                guard checkRegister(Parameters[0]) else{
+                    break;
+                }
+            
+                RAM[Parameters[1]] = Registers[Parameters[0]];
+                break;
             case 8:  //movemr.
                 guard checkRegister(Parameters[1]) else{
-                    print("FATAL ERROR ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
+                    
                     break;
                 }
                 guard checkMemoryLocation(Parameters[0]) else {
-                    print("FATAL ERROR ILLEGAL MEMORY LOCATION: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 Registers[Parameters[1]]=RAM[Parameters[0]]
@@ -150,28 +161,31 @@ class VirtualMachine{
                 break;
             case 12: //addir.
                 guard checkRegister(Parameters[1]) else{
-                    print("FATAL ERROR ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 Registers[Parameters[1]] += Parameters[0];
                 break;
             case 13: //addrr.
                 guard checkRegister(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 guard checkRegister(Parameters[1]) else {
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 Registers[Parameters[1]] = Registers[Parameters[1]] + Registers[Parameters[0]];
+                break;
+            case 20: //mulir
+                guard checkRegister(Parameters[1]) else{
+                    break;
+                }
+                
+                Registers[Parameters[1]] *= Parameters[0];
                 break;
             case 28:
                 SpRegisters["PGRM"] = Parameters[0];
                 break;
             case 33:
                 guard checkRegister(Parameters[1]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 if Parameters[0] > Registers[Parameters[1]]{
@@ -184,11 +198,9 @@ class VirtualMachine{
                 break;
             case 34: //cmprr.
                 guard checkRegister(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 guard checkRegister(Parameters[1]) else {
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[1]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 if Registers[Parameters[0]] > Registers[Parameters[1]]{
@@ -201,21 +213,18 @@ class VirtualMachine{
                 break;
             case 45: //outcr.
                 guard checkRegister(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 print(Character(UnicodeScalar(Registers[Parameters[0]])!),terminator:"");
                 break;
             case 49: //printi
                 guard checkRegister(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL REGISTER #: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 print(Registers[Parameters[0]],terminator:"");
                 break;
             case 55: //outs.
                 guard checkMemoryLocation(Parameters[0]) else{
-                    print("FATAL ERROR: ILLEGAL MEMORY LOCATION: \(Parameters[0]) PC: \(SpRegisters["PGRM"]!)")
                     break;
                 }
                 let Str = RAM[Parameters[0] + 1...(Parameters[0] + 2 + RAM[Parameters[0]])]; //Get the string as an array of ints.

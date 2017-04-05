@@ -18,7 +18,7 @@ Assemble.load(Program:toLoad);
 let PGRM = Assemble.Assemble();
 print(PGRM);
 
-
+print();
 var VM = VirtualMachine();
 
 VM.loadMem(FullMem: PGRM);

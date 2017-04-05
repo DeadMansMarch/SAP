@@ -113,8 +113,9 @@ class Assembler{
             let Options = String(ColonBreaker[CInd]).characters.split(separator: " ")
                                                     .filter({!$0.isEmpty})
                                                     .map{String($0)};
+            print(Line)
             
-            let Command = Options[0];
+            let Command = (Options.count > 0) ? Options[0] : "";
             
             if let cmdInt = commandListing[Command]{
 
@@ -155,12 +156,19 @@ class Assembler{
                     case ".String":
                         guard Options.count > 1 else{
                             print("Error : .String takes at least 1 option.");
-                            break;
+                            return [Int]();
                         }
-                        let Collision = Options[1...Options.count - 1].reduce("",{$0 + " \($1)"});
-                        let STR = String(Collision.characters.dropFirst(2).dropLast());
-                        Data.append(Int(STR.characters.count));
-                        STR.characters.map{let S = String($0).unicodeScalars; return Int(S[S.startIndex].value)}
+                        
+                        let QSplit = Line.characters.split(separator: "\"");
+                        
+                        guard QSplit.count >= 2 else{
+                            print("Syntax error: .String call without quotations.");
+                            return [Int]();
+                        }
+                        
+                        let STR = QSplit[1]; //"first of string" "part of quote" "end quote, blank."
+                        Data.append(Int(STR.count));
+                        STR.map{let S = String($0).unicodeScalars; return Int(S[S.startIndex].value)}
                             .forEach({Data.append($0)});
                         
                         break;
@@ -168,7 +176,13 @@ class Assembler{
                         print("Start established at location: \(Options[1].lowercased()).")
                         startPointer = Options[1].lowercased();
                         break;
+                    case ".end":
+                        print("Program assembled.")
+                        break;
+                    case "": //Empty line.
+                        break;
                     default:
+                        print(Data.count)
                         print("This command did not exist.")
                         break;
                 }
