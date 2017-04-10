@@ -185,7 +185,7 @@ class VirtualMachine{
                     break;
                 }
                 
-                RAM[Params[1]] = RAM[Params[0]];
+                Registers[Params[1]] = RAM[Params[0]];
                 break;
             case 10: //movar
                 guard checkMemoryLocation(Params[0]) else{
@@ -223,6 +223,12 @@ class VirtualMachine{
                     break;
                 }
                 Registers[Params[1]] = Registers[Params[1]] + Registers[Params[0]];
+                break;
+            case 16: //subir.
+                guard checkRegister(Params[1]) else {
+                    break;
+                }
+                Registers[Params[1]] += Params[0];
                 break;
             case 20: //mulir
                 guard checkRegister(Params[1]) else{
@@ -272,6 +278,50 @@ class VirtualMachine{
                     SpRegisters["CMPR"] = 1;
                 }
                 break;
+            case 35: //cmpmr
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else {
+                    break;
+                }
+                if RAM[Params[0]] > Registers[Params[1]]{
+                    SpRegisters["CMPR"] = 2;
+                }else if RAM[Params[0]] < Registers[Params[1]]{
+                    SpRegisters["CMPR"] = 0;
+                }else{
+                    SpRegisters["CMPR"] = 1;
+                }
+                break;
+            case 36: //jmpn
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                
+                if (SpRegisters["CMPR"] == 0){
+                    SpRegisters["PGRM"] = Params[0];
+                }
+                
+                break;
+            case 37: //jmpz
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                if (SpRegisters["CMPR"] == 1){
+                    SpRegisters["PGRM"] = Params[0];
+                }
+                break;
+            case 37: //jmpp
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                if (SpRegisters["CMPR"] == 2){
+                    SpRegisters["PGRM"] = Params[0];
+                }
+                break;
+            case 44: //outci
+                print(String(Character(UnicodeScalar(Params[0])!)));
+                break;
             case 45: //outcr.
                 guard checkRegister(Params[0]) else{
                     break;
@@ -283,6 +333,17 @@ class VirtualMachine{
                     break;
                 }
                 print(Registers[Params[0]],terminator:"");
+                break;
+            case 54: //movxx
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                
+                guard checkMemoryLocation(Params[1]) else{
+                    break;
+                }
+                
+                RAM[Params[1]] = RAM[Params[0]]
                 break;
             case 55: //outs.
                 guard checkMemoryLocation(Params[0]) else{

@@ -128,10 +128,13 @@ class Assembler{
                     
                         if let asInt = Int(Options[i]){
                             Data.append(asInt)
-                        }else if Options[i].characters.first == "r"{
+                        }else if Options[i].characters.first == "r" && i > 1{
                             Data.append(Int(String(Options[i].characters.dropFirst()))!);
-                        }else if Options[i].characters.first == "#"{
+                            print(Data[Data.count - 1]);
+                        }else if Options[i].characters.first == "#" && i > 1{
                             Data.append(Int(String(Options[i].characters.dropFirst()))!);
+                        }else if Options[i].characters.first == ";"{
+                            break;
                         }else{
                             let LOW = Options[i].lowercased()
                             if pointerReplicate[LOW] != nil{
@@ -175,26 +178,25 @@ class Assembler{
                             .forEach({Data.append($0)});
                         break;
                     case ".Tuple":
-                        let QSplit = Line.characters.split(separator: " ").filter({!$0.isEmpty}); //Error checking.
-                        guard QSplit.count >= 5 else{
+                        print(Options)
+                        guard Options.count >= 5 else{
                             print("Tuple length invalid.");
                             return [Int]();
                         }
-                        
-                        guard let InState = Int(String(QSplit[1])) else{
+                        guard let InState = Int(String(Options[1])) else{
                             print("InState is not a valid number.");
                             return [Int]();
                         }
                         
-                        let InChar = getASCI(Char:QSplit[2].first!)
+                        let InChar = getASCI(Char:Options[2].characters.first!)
                         
-                        guard let OutState = Int(String(QSplit[3])) else{
+                        guard let OutState = Int(String(Options[3])) else{
                             print("OutState is not a valid number.")
                             return [Int]();
                         }
                         
-                        let OutChar = getASCI(Char:QSplit[4].first!)
-                        let Dir = (String(QSplit[5]) == "l") ? 0 : 1; //If not l, it will be r.
+                        let OutChar = getASCI(Char:Options[4].characters.first!)
+                        let Dir = (String(Options[5]) == "l") ? 0 : 1; //If not l, it will be r.
                         
                         Data.append(InState); //Input State
                         Data.append(InChar); //InChar
