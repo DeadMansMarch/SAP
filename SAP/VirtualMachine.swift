@@ -41,6 +41,7 @@ class VirtualMachine{
     private(set) var Registers = [Int](repeating:0,count:10); //Registers.
     private(set) var SpRegisters = ["PGRM":0,"CMPR":0,"STCK":0]; //Special Registers.
     //                                              ^ 0 = less, 1 = equal, 2 = greater.
+    //                                              ^ x < y -> true? x - y is neg. 0 is neg, 2 is pos, 1 is eq.
     
     
     func setMemoryLength(Length L:Int){ //Resets memory to certain size.
@@ -119,120 +120,180 @@ class VirtualMachine{
         
         let nParam = paramList[c] ?? 2;
         
-        let Parameters = mPC(Amount:nParam);
+        let Params = mPC(Amount:nParam);
         switch(c){
-            case 1:
+            case 1: //clrr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                Registers[Params[0]] = 0;
                 break;
-            case 2:
+            case 2: //clrx
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                RAM[Registers[Params[0]]] = 0;
+                break;
+            case 3: //clrm
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                
+                RAM[Params[0]] = 0;
+                break;
+            case 4: //clrb
+                RAM.replaceSubrange(Params[0]...Params[0] + Params[1], with: [Int](repeating:0,count:Params[1]))
                 break;
             case 5: //moveir
-                Registers[Parameters[1]] = Parameters[0];
-                guard checkRegister(Parameters[1]) else {
+                Registers[Params[1]] = Params[0];
+                guard checkRegister(Params[1]) else {
                     break;
                 }
                 break;
             case 6:  //moverr.
-                guard checkRegister(Parameters[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
-                guard checkRegister(Parameters[1]) else {
+                guard checkRegister(Params[1]) else {
                     break;
                 }
-                Registers[Parameters[1]]=Registers[Parameters[0]]
+                Registers[Params[1]]=Registers[Params[0]]
                 break;
             case 7: //moverm
-                guard checkRegister(Parameters[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
             
-                RAM[Parameters[1]] = Registers[Parameters[0]];
+                RAM[Params[1]] = Registers[Params[0]];
                 break;
             case 8:  //movemr.
-                guard checkRegister(Parameters[1]) else{
+                guard checkRegister(Params[1]) else{
                     
                     break;
                 }
-                guard checkMemoryLocation(Parameters[0]) else {
+                guard checkMemoryLocation(Params[0]) else {
                     break;
                 }
-                Registers[Parameters[1]]=RAM[Parameters[0]]
+                Registers[Params[1]]=RAM[Params[0]]
                 break;
-            case 9: //
-                break;
-            case 12: //addir.
-                guard checkRegister(Parameters[1]) else{
-                    break;
-                }
-                Registers[Parameters[1]] += Parameters[0];
-                break;
-            case 13: //addrr.
-                guard checkRegister(Parameters[0]) else{
-                    break;
-                }
-                guard checkRegister(Parameters[1]) else {
-                    break;
-                }
-                Registers[Parameters[1]] = Registers[Parameters[1]] + Registers[Parameters[0]];
-                break;
-            case 20: //mulir
-                guard checkRegister(Parameters[1]) else{
+            case 9: //movxr
+                guard checkMemoryLocation(Params[0]) else{
                     break;
                 }
                 
-                Registers[Parameters[1]] *= Parameters[0];
-                break;
-            case 28:
-                SpRegisters["PGRM"] = Parameters[0];
-                break;
-            case 33:
-                guard checkRegister(Parameters[1]) else{
+                guard checkMemoryLocation(Params[1]) else{
                     break;
                 }
-                if Parameters[0] > Registers[Parameters[1]]{
+                
+                RAM[Params[1]] = RAM[Params[0]];
+                break;
+            case 10: //movar
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                
+                Registers[Params[1]] = Params[0];
+                break;
+            case 11: //movb
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                
+                guard checkMemoryLocation(Params[2]) else{
+                    break;
+                }
+                
+                RAM.replaceSubrange(Params[1]...Params[1]+Params[2], with: RAM[Params[0]...Params[0] + Params[2]]);
+                break;
+            case 12: //addir.
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] += Params[0];
+                break;
+            case 13: //addrr.
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else {
+                    break;
+                }
+                Registers[Params[1]] = Registers[Params[1]] + Registers[Params[0]];
+                break;
+            case 20: //mulir
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                
+                Registers[Params[1]] *= Params[0];
+                break;
+            case 21: //mulrr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                
+                Registers[Params[1]] = Registers[Params[0]] * Registers[Params[1]];
+                break;
+            case 28:
+                SpRegisters["PGRM"] = Params[0];
+                break;
+            case 33:
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                if Params[0] > Registers[Params[1]]{
                     SpRegisters["CMPR"] = 2;
-                }else if Parameters[0] < Registers[Parameters[1]]{
+                }else if Params[0] < Registers[Params[1]]{
                     SpRegisters["CMPR"] = 0;
                 }else{
                     SpRegisters["CMPR"] = 1;
                 }
                 break;
             case 34: //cmprr.
-                guard checkRegister(Parameters[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
-                guard checkRegister(Parameters[1]) else {
+                guard checkRegister(Params[1]) else {
                     break;
                 }
-                if Registers[Parameters[0]] > Registers[Parameters[1]]{
+                if Registers[Params[0]] > Registers[Params[1]]{
                     SpRegisters["CMPR"] = 2;
-                }else if Registers[Parameters[0]] < Registers[Parameters[1]]{
+                }else if Registers[Params[0]] < Registers[Params[1]]{
                     SpRegisters["CMPR"] = 0;
                 }else{
                     SpRegisters["CMPR"] = 1;
                 }
                 break;
             case 45: //outcr.
-                guard checkRegister(Parameters[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
-                print(Character(UnicodeScalar(Registers[Parameters[0]])!),terminator:"");
+                print(Character(UnicodeScalar(Registers[Params[0]])!),terminator:"");
                 break;
             case 49: //printi
-                guard checkRegister(Parameters[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
-                print(Registers[Parameters[0]],terminator:"");
+                print(Registers[Params[0]],terminator:"");
                 break;
             case 55: //outs.
-                guard checkMemoryLocation(Parameters[0]) else{
+                guard checkMemoryLocation(Params[0]) else{
                     break;
                 }
-                let Str = RAM[Parameters[0] + 1...(Parameters[0] + 2 + RAM[Parameters[0]])]; //Get the string as an array of ints.
+                let Str = RAM[Params[0] + 1...(Params[0] + RAM[Params[0]])]; //Get the string as an array of ints.
                 print(Str.map{String(Character(UnicodeScalar($0)!))}.reduce("",+),terminator:"")
                 break;
             case 57: //jumpne
                 if (SpRegisters["CMPR"]! != 1){ //Not equal.
-                    SpRegisters["PGRM"] = Parameters[0] //Set PGRM counter to location in memory : PGRM + 1
+                    SpRegisters["PGRM"] = Params[0] //Set PGRM counter to location in memory : PGRM + 1
                 }
                 break;
             default:

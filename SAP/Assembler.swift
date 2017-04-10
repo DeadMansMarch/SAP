@@ -86,6 +86,11 @@ class Assembler{
     private(set) var pointerReplicate:[String:[Int]] = [:];
     private(set) var program:String? = "";
     
+    func getASCI(Char:Character)->Int{
+        let S = String(Char).unicodeScalars;
+        return Int(S[S.startIndex].value);
+    }
+    
     func load(Program:String){
         self.program = Program;
     }
@@ -113,12 +118,10 @@ class Assembler{
             let Options = String(ColonBreaker[CInd]).characters.split(separator: " ")
                                                     .filter({!$0.isEmpty})
                                                     .map{String($0)};
-            print(Line)
             
             let Command = (Options.count > 0) ? Options[0] : "";
             
             if let cmdInt = commandListing[Command]{
-
                 Data.append(cmdInt);
                 if Options.count > 1{
                     for i in 1...Options.count - 1{ //For each option.
@@ -168,8 +171,36 @@ class Assembler{
                         
                         let STR = QSplit[1]; //"first of string" "part of quote" "end quote, blank."
                         Data.append(Int(STR.count));
-                        STR.map{let S = String($0).unicodeScalars; return Int(S[S.startIndex].value)}
+                        STR.map(getASCI)
                             .forEach({Data.append($0)});
+                        break;
+                    case ".Tuple":
+                        let QSplit = Line.characters.split(separator: " ").filter({!$0.isEmpty}); //Error checking.
+                        guard QSplit.count >= 5 else{
+                            print("Tuple length invalid.");
+                            return [Int]();
+                        }
+                        
+                        guard let InState = Int(String(QSplit[1])) else{
+                            print("InState is not a valid number.");
+                            return [Int]();
+                        }
+                        
+                        let InChar = getASCI(Char:QSplit[2].first!)
+                        
+                        guard let OutState = Int(String(QSplit[3])) else{
+                            print("OutState is not a valid number.")
+                            return [Int]();
+                        }
+                        
+                        let OutChar = getASCI(Char:QSplit[4].first!)
+                        let Dir = (String(QSplit[5]) == "l") ? 0 : 1; //If not l, it will be r.
+                        
+                        Data.append(InState); //Input State
+                        Data.append(InChar); //InChar
+                        Data.append(OutState); //OutState
+                        Data.append(OutChar); //OutChar
+                        Data.append(Dir) //OutDir;
                         
                         break;
                     case ".Start":
@@ -182,8 +213,9 @@ class Assembler{
                     case "": //Empty line.
                         break;
                     default:
-                        print(Data.count)
-                        print("This command did not exist.")
+                        if (Command.characters.first != ";"){
+                            print("This command did not exist.")
+                        }
                         break;
                 }
                 

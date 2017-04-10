@@ -1,13 +1,7 @@
-.Start Draw
+.Start TuplePlayer
 
-L1: .String "o        o"
-L2: .String "     \    "
-L3: .String "     _\   "
-L4: .String "    ___   "
+.Tuple 0 A 0 C l
 
-Draw: outs L1
-        outs L2
-        outs L3
-        outs L4
-        halt
-        .end
+
+TuplePlayer: halt
+            .end

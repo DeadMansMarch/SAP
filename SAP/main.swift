@@ -8,7 +8,6 @@
 
 import Foundation
 
-// I have a save file class we can use for read/write stuff, but for now:
 let Program = saveFile(withName:"/School/Programming/Random/SAP/A nice program test");
 print(Program);
 let toLoad = Program.read()!;
@@ -17,7 +16,6 @@ let Assemble = Assembler();
 Assemble.load(Program:toLoad);
 let PGRM = Assemble.Assemble();
 print(PGRM);
-
 print();
 var VM = VirtualMachine();
 
