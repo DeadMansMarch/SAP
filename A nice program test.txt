@@ -3,81 +3,64 @@
 CS: .Integer #0   ;Current State
 
 Tape: .Integer #0 ;Tape data.
-endTpl: .Integer #3 ;End tape.
+endTape: .Integer #3 ;End tape.
 
-outTError: .String "No possible tuples.";
-boundsOutError: .String "Tape out of bounds.";
-Mess: .String "Looking for tuples."
-tStart: .Tuple 0 0 0 1 r ;Start position of the tape.
-        .Tuple 0 3 1 C r
-endT:   .Tuple 1 3 1 3 r
+tupleStart: .Tuple 0 0 0 1 r ;Start position of the tape.
+endTuple:   .Tuple 0 3 1 C r
 
-;;Operation :
-;;  Start at Tuple Player, move begining positions to registers 0 and 1.
-;;  go to tupleLoop, find a tuple matching the current state and input character (Tape).
-;;  change current state and the tape's value, and change register 1 accordingly.
 
-;;Tuple Loop:
 
-tupleFinder: movmr r0 r2 ;Get tuple's IS value.
-             cmpmr CS r2 ;Test if the value was equal.
-             jmpz inputCheck
-             jmp pastm
-inputCheck:  addir #1 r0 ;Move memory pointer to tuple's IC value.
-             movxr r0 r2 ;Move test IC to r2 for comparison.
-             movxr r1 r3 ;Move actual input to r3
-             cmprr r2 r3
-             jmpz inputPass ;If input character cond is equal, move to pass.
-             addir #4 r0
-             jmp past ;Not equal, move to next test.
+TuplePlayer: movar Tape r0
+             jmp tupleReader
 
-inputPass:   addir #1 r0 ;Move memory pointer to output state.
-             movar CS r3 ;Move CS location to r3
-             movxx r0 r3 ;Change current state.
-             addir #1 r0 ;Move memory pointer to output character.
-             movxx r0 r1 ;Change output character.
-             addir #1 r0 ;Move memory pointer to direction.
-             movxr r0 r3 ;Get direction value and move to r3.
-             cmpir #0 r3 ;See if L or R.
-             jmpz last
-             jmp next
-last:        subir #1 r0
-             jmp aft
-next:        addir #1 r0
-aft:         addir #1 r1
-             cmpir #0 r0 ;
-             jmpp BoundsError
-             movar endt r2
+TupleReader: movar tupleStart r1
+             jmp TupleTester
+TupleDataR:  movar endTape r2
              cmprr r0 r2
              jmpp printTape
-             jmpz printTape
-             jmp tupleLoop
-             outs outTFound
+             jmp TupleReader
 
-pastm:       addir #5 r0 ;Move to next tuple, nothing was found.
-past:        movar EndT r3
-             cmprr r0 r3
-             jmpn tupleFinder
-             jmp EndError
+TupleTester: movxr r1 r2
+             movmr CS r3
+             cmprr r2 r3
+             jmpz StateEquals
+             addir #5 r1
+             jmp BadTuple
+StateEquals: addir #1 r1
+             movxr r1 r2
+             movxr r0 r3
+             cmprr r2 r3
+             jmpz TupleEquals
 
-TuplePlayer: movar tStart r0 ;Move the start position to r0.
-             movar Tape r1 ;Move the tape position to r1.
-tupleLoop:   jmp tupleFinder
+TupleEquals: addir #1 r1
+             movrm r2 CS
+             movxx r3 r0
+             addir #1 r1
+             movxr r1 r2
+             cmpir #0 r2
+             jmpz SubFro
+             addir #1 r0
+             jmp outFro
+SubFro:      subir #1 r0
+outFro:      jmp TupleDataR
 
-printTape: movar Tape r0
-           movar endTpl r1
-repre:     movxr r0 r2
-           printi r2
-           addir #1 r0
-           cmprr r0 r1
-           jmpn repre
-           jmpz repre
+BadTuple: movar endTuple r2
+          cmprr r1 r2
+          jmpz Error
+          halt
+
+printTape: brk
+           movar Tape r1
+           movar endTape r2
+prnt:      movxr r1 r3
+           printi r3
            outci #10
-           halt
+           cmprr r1 r2
+           jmpz End
+           addir #1 r1
+           jmp prnt
+End:       halt
 
-BoundsError: outs boundsOutError
-             halt
-EndError:outs outTError
-     halt
-     .end
-
+noTulpesError: .String "No Tuples Match."
+Error: outs noTuplesError
+.end
