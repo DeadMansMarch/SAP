@@ -129,7 +129,14 @@ class Debugger{
                         printCommand(virtualMachine.SpRegisters["PGRM"]!);
                         break;
                     case "printmem":
-                        print(virtualMachine.RAM[Int(split[1])!...Int(split[2])!].reduce("",{"\($0) \($1)"}))
+                        if split.count == 1{
+                            print(virtualMachine.RAM.reduce("",{"\($0) \($1)"}))
+                        }else if split.count == 2{
+                            print(virtualMachine.RAM[Int(split[1])!]);
+                        }else{
+                            print(virtualMachine.RAM[Int(split[1])!...Int(split[2])!].reduce("",{"\($0) \($1)"}))
+                        }
+                        break;
                     case "memloc": //Gives the reader a bit of context. Helpful for debugging.
                         let Len = virtualMachine.RAM.count
                         let PG = virtualMachine.SpRegisters["PGRM"]!;

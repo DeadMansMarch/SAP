@@ -120,6 +120,14 @@ class Assembler{
                         STR.map(getASCI)
                             .forEach({Data.append($0)});
                         break;
+                    case ".Character":
+                        let QSplit = Line.characters.split(separator: "\'");
+                        guard QSplit.count >= 2 else{
+                            print("Syntax error: .String call without quotations.");
+                            return [Int]();
+                        }
+                        Data.append(getASCI(Char:QSplit[1].first!));
+                    
                     case ".Tuple":
                         print(Options)
                         guard Options.count >= 5 else{

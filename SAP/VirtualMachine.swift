@@ -241,15 +241,15 @@ class VirtualMachine{
                 Registers[Params[1]]=RAM[Params[0]]
                 break;
             case 9: //movxr
-                guard checkMemoryLocation(Params[0]) else{
+                guard checkRegister(Params[0]) else{
                     break;
                 }
                 
-                guard checkMemoryLocation(Params[1]) else{
+                guard checkRegister(Params[1]) else{
                     break;
                 }
                 
-                Registers[Params[1]] = RAM[Params[0]];
+                Registers[Params[1]] = RAM[Registers[Params[0]]];
                 break;
             case 10: //movar
                 guard checkMemoryLocation(Params[0]) else{
@@ -384,7 +384,7 @@ class VirtualMachine{
                 }
                 break;
             case 44: //outci
-                print(String(Character(UnicodeScalar(Params[0])!)));
+                print(String(Character(UnicodeScalar(Params[0])!)),terminator:"");
                 break;
             case 45: //outcr.
                 guard checkRegister(Params[0]) else{
@@ -401,6 +401,17 @@ class VirtualMachine{
             case 52: //brk : Attach debugger process to machine.
                 self.dbkProcess = Debugger(self);
                 break;
+            case 53: //movrx
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                
+                guard checkMemoryLocation(Registers[Params[1]]) else{
+                    break;
+                }
+                
+                RAM[Registers[Params[1]]] = Registers[Params[0]];
+                break;
             case 54: //movxx
                 guard checkMemoryLocation(Params[0]) else{
                     break;
@@ -410,7 +421,7 @@ class VirtualMachine{
                     break;
                 }
                 
-                RAM[Params[1]] = RAM[Params[0]]
+                RAM[Registers[Params[1]]] = RAM[Registers[Params[0]]]
                 break;
             case 55: //outs.
                 guard checkMemoryLocation(Params[0]) else{
