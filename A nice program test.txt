@@ -3,13 +3,13 @@
 CS: .Integer #0   ;Current State
 
 Tape: .Integer #0 ;Tape data.
-endT: .Integer #3 ;End tape.
+endTpl: .Integer #3 ;End tape.
 
-outTFound: .String "Wow FOund";
 outTError: .String "No possible tuples.";
+boundsOutError: .String "Tape out of bounds.";
+Mess: .String "Looking for tuples."
 tStart: .Tuple 0 0 0 1 r ;Start position of the tape.
-        .Tuple 0 3 1 C l
-        .Tuple 1 1 1 0 r
+        .Tuple 0 3 1 C r
 endT:   .Tuple 1 3 1 3 r
 
 ;;Operation :
@@ -19,26 +19,25 @@ endT:   .Tuple 1 3 1 3 r
 
 ;;Tuple Loop:
 
-tupleFinder: movmr r1 r3 ;Get tuple's IS value.
-             printi r3
-             outci #10
-             cmpmr CS r3 ;Test if the value was equal.
+tupleFinder: movmr r0 r2 ;Get tuple's IS value.
+             cmpmr CS r2 ;Test if the value was equal.
              jmpz inputCheck
              jmp pastm
-inputCheck:  addir #1 r1 ;Move memory pointer to tuple's IC value.
-             movxr r1 r3 ;Move test IC to r3 for comparison.
-             printi r3
-             jmpn inputPass ;If input character cond is equal, move to pass.
-             addir #4 r1
+inputCheck:  addir #1 r0 ;Move memory pointer to tuple's IC value.
+             movxr r0 r2 ;Move test IC to r2 for comparison.
+             movxr r1 r3 ;Move actual input to r3
+             cmprr r2 r3
+             jmpz inputPass ;If input character cond is equal, move to pass.
+             addir #4 r0
              jmp past ;Not equal, move to next test.
 
-inputPass:   addir #1 r1 ;Move memory pointer to output state.
+inputPass:   addir #1 r0 ;Move memory pointer to output state.
              movar CS r3 ;Move CS location to r3
-             movxx r1 r3 ;Change current state.
-             addir #1 r1 ;Move memory pointer to output character.
-             movxx r1 r0 ;Change output character.
-             addir #1 r1 ;Move memory pointer to direction.
-             movxr r1 r3 ;Get direction value and move to r3.
+             movxx r0 r3 ;Change current state.
+             addir #1 r0 ;Move memory pointer to output character.
+             movxx r0 r1 ;Change output character.
+             addir #1 r0 ;Move memory pointer to direction.
+             movxr r0 r3 ;Get direction value and move to r3.
              cmpir #0 r3 ;See if L or R.
              jmpz last
              jmp next
@@ -46,33 +45,38 @@ last:        subir #1 r0
              jmp aft
 next:        addir #1 r0
 aft:         addir #1 r1
+             cmpir #0 r0 ;
+             jmpp BoundsError
+             movar endt r2
+             cmprr r0 r2
+             jmpp printTape
+             jmpz printTape
              jmp tupleLoop
              outs outTFound
 
-pastm:       addir #5 r1 ;Move to next tuple, nothing was found.
+pastm:       addir #5 r0 ;Move to next tuple, nothing was found.
 past:        movar EndT r3
-             cmprr r1 r3
+             cmprr r0 r3
              jmpn tupleFinder
-             printi r3
-             printi r1
              jmp EndError
-
 
 TuplePlayer: movar tStart r0 ;Move the start position to r0.
              movar Tape r1 ;Move the tape position to r1.
-             movmr tStart r2 ;Move the first input character to r2.
 tupleLoop:   jmp tupleFinder
 
 printTape: movar Tape r0
-           movar endT r1
+           movar endTpl r1
 repre:     movxr r0 r2
            printi r2
            addir #1 r0
            cmprr r0 r1
            jmpn repre
+           jmpz repre
            outci #10
            halt
 
+BoundsError: outs boundsOutError
+             halt
 EndError:outs outTError
      halt
      .end
