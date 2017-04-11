@@ -147,7 +147,11 @@ class Assembler{
                         }
                         
                         let OutChar = getASCI(Char:Options[4].characters.first!)
-                        let Dir = (String(Options[5]) == "l") ? 0 : 1; //If not l, it will be r.
+                        guard Options[5]=="r" || Options[5]=="l" else {
+                            print("Direction is not \'l\' or \'r\'")
+                            return [Int]();
+                        }
+                        let Dir = (String(Options[5]) == "l") ? -1 : 1; //If not l, it will be r.
                         
                         Data.append(InState); //Input State
                         Data.append(InChar); //InChar
