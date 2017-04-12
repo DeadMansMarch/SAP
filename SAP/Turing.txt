@@ -1,0 +1,92 @@
+.Start Setup
+StartState: .Integer #0
+TapeStart:  .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '1'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+TapeEnd:    .Character '_'
+
+TuplesStart:    .Tuple 0 _ 0 _ r
+TuplesEnd:      .Tuple 0 1 1 2 r
+
+LBracket: .Character '['
+RBracket: .Character ']'
+
+Setup:  movmr StartState r0     ; initialize r0 as current state by putting in starting state
+        movar TapeStart r1      ; initialize r1 as pointer to current location on tape by pointing it at the start of tape
+        movar TuplesStart r2    ; initialize r2 as pointer to current tuple by pointing to first tuple
+        jmp PrintTape
+
+SearchTuples:   movxr r2 r3 ; move IS of current tuple to r3
+                cmprr r0 r3 ; compare IS of current tuple to CS
+                jmpz StateMatches ; state matches?
+                jmp TupleDoesNotMatch ; no? then the tuple cannot match
+
+StateMatches:   movrr r2 r9 ; move start of current tuple to r9
+                addir #1 r9 ; increment r9 to make it point to current tuple's IC
+                movxr r9 r3 ; move IC of current tuple to r3
+                movxr r1 r4 ; move current tape to r4
+                cmprr r3 r4 ; compare current tuple's IC to current tape
+                jmpz Execute ; IC and CS match -> execute tuple
+                jmp TupleDoesNotMatch
+
+TupleDoesNotMatch:  addir #5 r2
+                    movar TuplesEnd r3 ; move location in mem of last tuple to r3
+                    cmprr r2 r3 ; compare adress of next tuple to be checked to adress of last in list
+                    jmpp EndOfProgram ; is address of next tuple > adress of last in list? -> exit program there are no more
+                    jmp SearchTuples ; no? search again
+
+Execute:    movrr r2 r9 ; copy pointer to current tuple to r9
+            addir #2 r9 ; add 2 to current pointer to make it point to NS
+            movxr r9 r0 ; move state located at position in r9 into r0 storage of current state
+            addir #1 r9 ; add 1 to current pointer to make it point to OC
+            movxx r9 r1 ; move OC stored at location in r9 to current tape location stored in r0
+            addir #1 r9 ; add 1 to current pointer to make it point to D
+            addxr r9 r1 ; add direction number stored at location in r9 to current tape pointer located in r1
+            jmp PrintTape
+
+PrintTape:  movar TapeStart r8 ; move location of start of tape to r3
+            movar TapeEnd r9 ; move location of end of tape to r4
+continue:   cmprr r8 r9 ; compare begin and end of tape
+            jmpn FinishPrint ; if we are finished printing, begin the next iteration
+            cmprr r8 r1 ; see if the current iterand in r8 matches the head location on tape in r1
+            jmpz PrintBrackets ; if it matches print brackets around this location
+            jmp PrintNoBrackets ; no? then just print normally
+
+PrintBrackets:  movmr LBracket r3 ; move [ into r3
+                outcr r3 ; print r3
+                movxr r8 r3 ; move current tape for printing whoose location is in r8 to r3
+                outcr r3 ; print r3
+                movmr RBracket r3 ; move ] into r3
+                outcr r3 ; print r3
+                addir #1 r8
+                jmp continue
+
+PrintNoBrackets:    movxr r8 r3 ; move current tape for printing whoose location is in r8 to r3
+                    outcr r3 ; print r3
+                    addir #1 r8
+                    jmp continue
+FinishPrint:    outci #10 ; print a new line character
+                jmp SearchTuples
+EndOfProgram: halt
+.end

@@ -288,6 +288,18 @@ class VirtualMachine{
                 }
                 Registers[Params[1]] = Registers[Params[1]] + Registers[Params[0]];
                 break;
+            case 15:
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Registers[Params[0]]) else {
+                    break;
+                }
+                Registers[Params[0]] += RAM[Registers[Params[1]]]
+                break;
             case 16: //subir.
                 guard checkRegister(Params[1]) else {
                     break;
@@ -391,6 +403,12 @@ class VirtualMachine{
                     break;
                 }
                 print(Character(UnicodeScalar(Registers[Params[0]])!),terminator:"");
+                break;
+            case 46: //outcx
+                guard checkMemoryLocation(Params[0]) else {
+                    break;
+                }
+                print(Character(UnicodeScalar(RAM[Params[0]])!),terminator:"");
                 break;
             case 49: //printi
                 guard checkRegister(Params[0]) else{

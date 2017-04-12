@@ -2,72 +2,118 @@
 
 CS:         .Integer #0   ;Current State
 
-Tape:       .Character '0' ;Tape data.
-endTape:    .Character '3' ;End tape.
+Tape:       .Character '_' ;Tape data.
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '1'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+.Character '_'
+endTape:    .Character '_' ;End tape.
 
-tupleStart: .Tuple 0 0 0 1 r ;Start position of the tape.
-endTuple:   .Tuple 0 3 1 C r
+tupleStart: .Tuple 0 _ 0 _ r
+endTuple:   .Tuple 0 1 1 2 r
 
 space:      .Character ' '
+lbracket:   .Character '['
+rbracket:   .Character ']'
+TPdebug: .String "entered TuplePlayer"
+TRdebug: .String "entered TupleReader"
+TDRdebug: .String "entered TupleDataR"
+TTdebug: .String "entered TupleTester"
+SEdebug: .String "entered StateEquals"
+TEdebug: .String "entered Tuple Equals"
+BTdebug: .String "entered BadTuple"
+PTdebug: .String "entered PrintTape"
+PRdebug: .String "entered prnt"
+BPdebug: .String "entered printBracket"
 
+TuplePlayer:    outs TPdebug
+                movar Tape r0 ; initialize r0 tape pointer by putting in start of tape
 
-TuplePlayer: movar Tape r0 ; initialize r0 tape pointer by putting in start of tape
+TupleReader:    outs Trdebug
+                movar tupleStart r1 ; intitialize r1 tuple pointer by putting in start of first tuple
+                jmp printTape
 
-TupleReader: movar tupleStart r1 ; intitialize r1 tuple pointer by putting in start of first tuple
-             jmp TupleTester
+TupleDataR:     outs TDRdebug
+                movar endTape r2
+                cmprr r2 r0
+                jmpn Error
+                jmp printTape
 
-TupleDataR:  movar endTape r2
-             cmprr r0 r2
-             jmpn Error
-             jmp PrintTape
+TupleTester:    outs TTdebug
+                movxr r1 r2 ; move state from current tuple to r2
+                movmr CS r3 ; move current state to r3
+                cmprr r2 r3 ; compare states
+                jmpz StateEquals ; match? -> StateEquals
+                addir #5 r1 ; advance r1 tuple pointer to next tuple
+                jmp BadTuple
 
-TupleTester: movxr r1 r2 ; move state from current tuple to r2
-             movmr CS r3 ; move current state to r3
-             cmprr r2 r3 ; compare states
-             jmpz StateEquals ; match? -> StateEquals
-             addir #5 r1 ; advance r1 tuple pointer to next tuple
-             jmp BadTuple
+StateEquals:    outs SEdebug
+                addir #1 r1 ; move r0 tuple pointer to ic for current tuple
+                movxr r1 r2 ; move ic from current tuple to r2
+                movxr r0 r3 ; move current tape location to r3
+                cmprr r2 r3 ; compare chars
+                jmpz TupleEquals ; match? -> found correct tuple, execute it
+                addir #4 r1 ; no? -> advance r1 tuple pointer to next tuple
+                jmp BadTuple
 
-StateEquals: addir #1 r1 ; move r0 tuple pointer to ic for current tuple
-             movxr r1 r2 ; move ic from current tuple to r2
-             movxr r0 r3 ; move current tape location to r3
-             cmprr r2 r3 ; compare chars
-             jmpz TupleEquals ; match? -> found correct tuple, execute it
-             addir #4 r1 ; no? -> advance r1 tuple pointer to next tuple
-             jmp BadTuple
+TupleEquals:    outs TEdebug
+                addir #1 r1 ; advance r1 to point to next state
+                movxr r1 r2 ; get next state
+                movrm r2 CS ; CS = next state
+                addir #1 r1 ; advance r1 to point to output char
+                movxr r1 r3 ; get output char
+                movrx r3 r0 ; move output char to current tape location (stored in r0)
+;brk
+                addir #1 r1 ; advance r1 to point to direction
+                movxr r1 r2 ; get direction
+                addrr r2 r0 ; add direction to current tape location
+                jmp TupleDataR
 
-TupleEquals: addir #1 r1 ; advance r1 to point to next state
-             movxr r1 r2 ; get next state
-             movrm r2 CS ; CS = next state
-             addir #1 r1 ; advance r1 to point to output char
-             movxr r1 r3 ; get output char
-             movrx r3 r0 ; move output char to current tape location (stored in r0)
-             addir #1 r1 ; advance r1 to point to direction
-             movxr r1 r2 ; get direction
-             addrr r0 r2 ; add direction to current tape location
-             jmp TupleDataR
+BadTuple:   outs BTdebug
+;brk
+            movar endTuple r2 ;move start location of last tuple to r2
+;addir #5 r2 ; advance by 5 to find start of imaginary tuple
+            cmprr r2 r1 ; would the next tuple read by that imaginary one?
+            jmpz Error   ;yes? -> halt because no tuples matched
+            jmpp Error
+            jmp TupleTester
 
-BadTuple: movar endTuple r2 ;move start location of last tuple to r2
-          addir #5 r2 ; advance by 5 to find start of imaginary tuple
-          cmprr r1 r2 ; would the next tuple read by that imaginary one?
-          jmpz Error   ;yes? -> halt because no tuples matched
-          jmp TupleTester
+printTape:  ;outs PTdebug
+            movar Tape r5
+            movar endTape r6
 
-printTape: movar Tape r1
-           movar endTape r2
+prnt:       ;outs PRdebug
+            cmprr r5 r6
+            jmpz printBracket
+            movxr r5 r3
+            outcr r3
+continue:   movmr space r3
+            outci r3
+            cmprr r5 r6
+            jmpz End
+            addir #1 r5
+            jmp prnt
+printBracket:   outs BPdebug
+;brk
+                movar rbracket r4
+                outcr r4
+                outcr r3
+                movar lbracket r4
+                outcr r4
+                jmp continue
 
-prnt:      movxr r1 r3
-           outcr r3
-           movmr space r3
-           outci r3
-           cmprr r1 r2
-           jmpz End
-           addir #1 r1
-           jmp prnt
-
-End:       outci #10
-           jmp TupleReader
-
+End:        outci #10
+            jmp TupleTester
 noTuplesError: .String "No Tuples Match."
 Error: halt
 .end
