@@ -52,6 +52,19 @@ endTuple: .Tuple 6 a 6 _ l
 
 space: .Character ' '
 
+space:      .Character ' '
+lbracket:   .Character '['
+rbracket:   .Character ']'
+TPdebug: .String "entered TuplePlayer"
+TRdebug: .String "entered TupleReader"
+TDRdebug: .String "entered TupleDataR"
+TTdebug: .String "entered TupleTester"
+SEdebug: .String "entered StateEquals"
+TEdebug: .String "entered Tuple Equals"
+BTdebug: .String "entered BadTuple"
+PTdebug: .String "entered PrintTape"
+PRdebug: .String "entered prnt"
+BPdebug: .String "entered printBracket"
 
 TuplePlayer: movar Tape r0
 TupleReader: movar tupleStart r1
@@ -63,33 +76,9 @@ TupleDataR:  movar endTape r2
              jmpp ErrorP
              jmp TupleReader
 
-TupleTester: movxr r1 r2
-             movmr CS r3
-             cmprr r2 r3
-             jmpz StateEquals
-             addir #5 r1
-             jmp BadTuple
-StateEquals: addir #1 r1
-             movxr r1 r2
-             movxr r0 r3
-             cmprr r2 r3
-             jmpz TupleEquals
-             addir #4 r1
-             jmp BadTuple
-TupleEquals: addir #1 r1
-             movxr r1 r2
-             movrm r2 CS
-             addir #1 r1
-             movxr r1 r3
-             movrx r3 r0
-             addir #1 r1
-             movxr r1 r2
-             cmpir #0 r2
-             jmpz SubFro
-             addir #1 r0
-             jmp outFro
-SubFro:      subir #1 r0
-outFro:      jmp TupleDataR
+TupleReader:    outs Trdebug
+                movar tupleStart r1 ; intitialize r1 tuple pointer by putting in start of first tuple
+                jmp printTape
 
 BadTuple: movar endTuple r2
           addir #5 r2
@@ -98,18 +87,13 @@ BadTuple: movar endTuple r2
           jmp TupleTester
           halt
 
-printTape: movar Tape r1
-           movar endTape r2
-prnt:      movxr r1 r3
-           outcr r3
-           movmr space r3
-           outci r3
-           cmprr r1 r2
-           jmpz End
-           addir #1 r1
-           jmp prnt
-End:       outci #10
-           halt
+TupleTester:    outs TTdebug
+                movxr r1 r2 ; move state from current tuple to r2
+                movmr CS r3 ; move current state to r3
+                cmprr r2 r3 ; compare states
+                jmpz StateEquals ; match? -> StateEquals
+                addir #5 r1 ; advance r1 tuple pointer to next tuple
+                jmp BadTuple
 
 Error: .String "Head out of bounds."
 ErrorP: outs Error

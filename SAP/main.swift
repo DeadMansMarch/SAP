@@ -8,7 +8,7 @@
 
 import Foundation
 
-let Program = saveFile(withName:"/School/Programming/Random/SAP/A nice program test");
+let Program = saveFile(withName:"/SAP/SAP/Turing");
 print(Program);
 let toLoad = Program.read()!;
 

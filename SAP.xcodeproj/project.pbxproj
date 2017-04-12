@@ -37,6 +37,7 @@
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
 		28857CB61E9C754F00E094F5 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
+		96A1C4B01E9DC56B001FA6C2 /* Turing.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Turing.txt; sourceTree = "<group>"; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +56,7 @@
 			children = (
 				2828B2641E93D19D0092FB20 /* programSave.txt */,
 				2828B2691E9437910092FB20 /* A nice program test.txt */,
+				96A1C4B01E9DC56B001FA6C2 /* Turing.txt */,
 			);
 			name = Programs;
 			sourceTree = "<group>";

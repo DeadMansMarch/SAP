@@ -1,0 +1,178 @@
+.Start Setup
+StartState: .Integer #0
+TapeStart:  .Character '_'
+            .Character '_'
+            .Character '1'
+            .Character '1'
+            .Character '_'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+            .Character '_'
+TapeEnd:    .Character '_'
+
+; replace ___1___ with ___2___
+
+;TuplesStart:    .Tuple 0 _ 0 _ r
+;TuplesEnd:      .Tuple 0 1 1 2 r
+
+; replace _________ with _<===3_<===3_ etc.
+
+;TuplesStart:    .Tuple 0 _ 1 < r
+;               .Tuple 1 _ 2 = r
+;               .Tuple 2 _ 3 = r
+;                .Tuple 3 _ 4 = r
+;                .Tuple 4 _ 5 3 r
+;TuplesEnd:      .Tuple 5 _ 0 _ r
+
+; Start in state zero -> replace ___11_____ with ___11_11__
+; Start in state -1 -> replace __111_111_____ with _111_111_111111__
+
+;TuplesStart:    .Tuple -1 _ -1 _ r
+;                .Tuple -1 1 -2 1 r
+;                .Tuple -2 1 -2 1 r
+;                .Tuple -2 _ -3 a l
+;                .Tuple -3 1 -3 1 l
+;                .Tuple -3 _ 0 _ r
+;                .Tuple 0 _ 0 _ r
+;                .Tuple 0 1 1 x r
+;                .Tuple 0 a 0 a r
+;                .Tuple 1 1 1 1 r
+;                .Tuple 1 a 1 a r
+;                .Tuple 1 _ 2 _ r
+;                .Tuple 2 1 2 1 r
+;                .Tuple 2 _ 3 1 l
+;                .Tuple 3 1 3 1 l
+;                .Tuple 3 _ 4 _ l
+;                .Tuple 4 1 5 1 l
+;                .Tuple 4 x 6 1 l
+;                .Tuple 5 1 5 1 l
+;                .Tuple 5 a 5 a l
+;                .Tuple 5 x 0 x r
+;                .Tuple 6 x 6 1 l
+;TuplesEnd:      .Tuple 6 a 6 _ l
+
+;replace __11111___ with __aaaaa___
+
+;TuplesStart:    .Tuple 0 _ 0 _ r
+;                .Tuple 0 1 1 a r
+;                .Tuple 1 1 1 1 r
+;                .Tuple 1 _ 2 _ r
+;                .Tuple 2 1 2 1 r
+;                .Tuple 2 _ 3 1 l
+;                .Tuple 3 1 3 1 l
+;                .Tuple 3 _ 3 _ l
+;TuplesEnd:      .Tuple 3 a 0 a r
+
+; replace _111_11________ with _111_11_111111___
+
+TuplesStart:    .Tuple 0 _ 0 _ r
+                .Tuple 0 1 1 1 r
+                .Tuple 1 1 1 1 r
+                .Tuple 1 _ 2 P l
+                .Tuple 2 1 2 1 l
+                .Tuple 2 _ 3 _ r
+                .Tuple 3 1 4 a r
+                .Tuple 4 1 4 1 r
+                .Tuple 4 P 5 P r
+                .Tuple 5 1 6 x r
+                .Tuple 6 1 6 1 r
+                .Tuple 6 _ 7 _ r
+                .Tuple 7 1 7 1 r
+                .Tuple 7 _ 8 1 l
+                .Tuple 8 1 8 1 l
+                .Tuple 8 _ 9 _ l
+                .Tuple 9 1 10 1 l
+                .Tuple 9 x 11 1 l
+                .Tuple 10 1 10 1 l
+                .Tuple 10 x 5 x r
+                .Tuple 11 x 11 1 l
+                .Tuple 11 P 12 P l
+                .Tuple 12 1 13 1 l
+                .Tuple 12 a 14 1 l
+                .Tuple 13 1 13 1 l
+                .Tuple 13 a 3 a r
+                .Tuple 14 a 14 1 l
+                .Tuple 14 _ 15 _ r
+                .Tuple 15 1 15 1 r
+TuplesEnd:      .Tuple 15 P 15 _ r
+
+LBracket: .Character '['
+RBracket: .Character ']'
+
+Setup:  movmr StartState r0     ; initialize r0 as current state by putting in starting state
+        movar TapeStart r1      ; initialize r1 as pointer to current location on tape by pointing it at the start of tape
+        movar TuplesStart r2    ; initialize r2 as pointer to current tuple by pointing to first tuple
+        jmp PrintTape
+
+SearchTuples:   movxr r2 r3 ; move IS of current tuple to r3
+                cmprr r0 r3 ; compare IS of current tuple to CS
+                jmpz StateMatches ; state matches?
+                jmp TupleDoesNotMatch ; no? then the tuple cannot match
+
+StateMatches:   movrr r2 r9 ; move start of current tuple to r9
+                addir #1 r9 ; increment r9 to make it point to current tuple's IC
+                movxr r9 r3 ; move IC of current tuple to r3
+                movxr r1 r4 ; move current tape to r4
+                cmprr r3 r4 ; compare current tuple's IC to current tape
+                jmpz Execute ; IC and CS match -> execute tuple
+                jmp TupleDoesNotMatch
+
+TupleDoesNotMatch:  addir #5 r2
+                    movar TuplesEnd r3 ; move location in mem of last tuple to r3
+                    cmprr r2 r3 ; compare adress of next tuple to be checked to adress of last in list
+                    jmpp EndOfProgram ; is address of next tuple > adress of last in list? -> exit program there are no more
+                    jmp SearchTuples ; no? search again
+
+Execute:    ;brk
+            movrr r2 r9 ; copy pointer to current tuple to r9
+            addir #2 r9 ; add 2 to current pointer to make it point to NS
+            movxr r9 r0 ; move state located at position in r9 into r0 storage of current state
+            addir #1 r9 ; add 1 to current pointer to make it point to OC
+            movxx r9 r1 ; move OC stored at location in r9 to current tape location stored in r0
+            addir #1 r9 ; add 1 to current pointer to make it point to D
+            addxr r9 r1 ; add direction number stored at location in r9 to current tape pointer located in r1
+            jmp PrintTape
+
+PrintTape:  movar TapeStart r8 ; move location of start of tape to r3
+            movar TapeEnd r9 ; move location of end of tape to r4
+;printi r0 ; print CS
+continue:   cmprr r9 r8 ; compare begin and end of tape
+            jmpn FinishPrint ; if we are finished printing, begin the next iteration
+            cmprr r8 r1 ; see if the current iterand in r8 matches the head location on tape in r1
+            jmpz PrintBrackets ; if it matches print brackets around this location
+            jmp PrintNoBrackets ; no? then just print normally
+
+PrintBrackets:  movmr LBracket r3 ; move [ into r3
+                outcr r3 ; print r3
+                movxr r8 r3 ; move current tape for printing whoose location is in r8 to r3
+                outcr r3 ; print r3
+                movmr RBracket r3 ; move ] into r3
+                outcr r3 ; print r3
+                addir #1 r8
+                jmp continue
+
+PrintNoBrackets:    movxr r8 r3 ; move current tape for printing whoose location is in r8 to r3
+                    outcr r3 ; print r3
+                    addir #1 r8
+                    jmp continue
+FinishPrint:    outci #10 ; print a new line character
+                movar TuplesStart r2
+                jmp SearchTuples
+EndOfProgram: halt
+.end
