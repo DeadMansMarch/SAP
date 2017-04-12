@@ -8,12 +8,21 @@
 
 import Foundation
 
-let Program = saveFile(withName:"/SAP/SAP/Turing");
-print(Program);
-let toLoad = Program.read()!;
+let PGRMloc = ["/SAP/Programs","/School/Programming/Random/SAP/Programs"]
+
+var Program:String = "";
+for i in 0..<PGRMloc.count{
+    let Loc = "\(PGRMloc[i])/Turing";
+    print(Loc)
+    let Pgrm = saveFile(withName:Loc);
+    if let toLoad = Pgrm.read(){
+        Program = toLoad;
+        break;
+    }
+}
 
 let Assemble = Assembler();
-Assemble.load(Program:toLoad);
+Assemble.load(Program:Program);
 let PGRM = Assemble.Assemble();
 print(PGRM);
 print();

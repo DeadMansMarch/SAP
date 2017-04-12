@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2828B2601E9340110092FB20 /* saveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2828B25F1E9340110092FB20 /* saveFile.swift */; };
 		2828B2621E93CE540092FB20 /* Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2828B2611E93CE540092FB20 /* Assembler.swift */; };
-		2828B2671E93DDDD0092FB20 /* programSave.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2828B2641E93D19D0092FB20 /* programSave.txt */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		2869D2201E92C138007D273F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D21F1E92C138007D273F /* main.swift */; };
 		2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D2261E92C456007D273F /* VirtualMachine.swift */; };
 		28857CB71E9C754F00E094F5 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28857CB61E9C754F00E094F5 /* Debug.swift */; };
@@ -22,7 +21,6 @@
 			dstPath = usr/share/man/man1;
 			dstSubfolderSpec = 7;
 			files = (
-				2828B2671E93DDDD0092FB20 /* programSave.txt in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -31,13 +29,10 @@
 /* Begin PBXFileReference section */
 		2828B25F1E9340110092FB20 /* saveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = saveFile.swift; sourceTree = "<group>"; };
 		2828B2611E93CE540092FB20 /* Assembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assembler.swift; sourceTree = "<group>"; };
-		2828B2641E93D19D0092FB20 /* programSave.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = programSave.txt; path = ../programSave.txt; sourceTree = "<group>"; };
-		2828B2691E9437910092FB20 /* A nice program test.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "A nice program test.txt"; sourceTree = SOURCE_ROOT; };
 		2869D21C1E92C138007D273F /* SAP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SAP; sourceTree = BUILT_PRODUCTS_DIR; };
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
 		28857CB61E9C754F00E094F5 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
-		96A1C4B01E9DC56B001FA6C2 /* Turing.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Turing.txt; sourceTree = "<group>"; usesTabs = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,16 +46,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2828B2681E93DE500092FB20 /* Programs */ = {
-			isa = PBXGroup;
-			children = (
-				2828B2641E93D19D0092FB20 /* programSave.txt */,
-				2828B2691E9437910092FB20 /* A nice program test.txt */,
-				96A1C4B01E9DC56B001FA6C2 /* Turing.txt */,
-			);
-			name = Programs;
-			sourceTree = "<group>";
-		};
 		2869D2131E92C137007D273F = {
 			isa = PBXGroup;
 			children = (
@@ -80,7 +65,6 @@
 		2869D21E1E92C138007D273F /* SAP */ = {
 			isa = PBXGroup;
 			children = (
-				2828B2681E93DE500092FB20 /* Programs */,
 				2828B25F1E9340110092FB20 /* saveFile.swift */,
 				2869D21F1E92C138007D273F /* main.swift */,
 				2869D2261E92C456007D273F /* VirtualMachine.swift */,
