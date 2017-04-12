@@ -288,7 +288,7 @@ class VirtualMachine{
                 }
                 Registers[Params[1]] = Registers[Params[1]] + Registers[Params[0]];
                 break;
-            case 15:
+            case 15: //addxr
                 guard checkRegister(Params[0]) else{
                     break;
                 }
@@ -298,7 +298,7 @@ class VirtualMachine{
                 guard checkMemoryLocation(Registers[Params[0]]) else {
                     break;
                 }
-                Registers[Params[0]] += RAM[Registers[Params[1]]]
+                Registers[Params[1]] += RAM[Registers[Params[0]]]
                 break;
             case 16: //subir.
                 guard checkRegister(Params[1]) else {

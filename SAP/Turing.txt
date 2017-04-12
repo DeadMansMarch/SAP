@@ -2,14 +2,14 @@
 StartState: .Integer #0
 TapeStart:  .Character '_'
             .Character '_'
-            .Character '_'
-            .Character '_'
-            .Character '_'
-            .Character '_'
-            .Character '_'
-            .Character '_'
-            .Character '_'
             .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '1'
+            .Character '_'
             .Character '_'
             .Character '_'
             .Character '_'
@@ -26,8 +26,57 @@ TapeStart:  .Character '_'
             .Character '_'
 TapeEnd:    .Character '_'
 
+; replace ___1___ with ___2___
+
+;TuplesStart:    .Tuple 0 _ 0 _ r
+;TuplesEnd:      .Tuple 0 1 1 2 r
+
+; replace _________ with _<===3_<===3_ etc.
+
+;TuplesStart:    .Tuple 0 _ 1 < r
+;                .Tuple 1 _ 2 = r
+;                .Tuple 2 _ 3 = r
+;                .Tuple 3 _ 4 = r
+;                .Tuple 4 _ 5 3 r
+;TuplesEnd:      .Tuple 5 _ 0 _ r
+
+; replace ___11_____ with ___11_11__
+
+;TuplesStart:    .Tuple -1 _ -1 _ r
+;                .Tuple -1 1 -2 1 r
+;                .Tuple -2 1 -2 1 r
+;                .Tuple -2 _ -3 a l
+;                .Tuple -3 1 -3 1 l
+;                .Tuple -3 _ 0 _ r
+;                .Tuple 0 _ 0 _ r
+;                .Tuple 0 1 1 x r
+;                .Tuple 0 a 0 a r
+;                .Tuple 1 1 1 1 r
+;                .Tuple 1 a 1 a r
+;                .Tuple 1 _ 2 _ r
+;                .Tuple 2 1 2 1 r
+;                .Tuple 2 _ 3 1 l
+;                .Tuple 3 1 3 1 l
+;                .Tuple 3 _ 4 _ l
+;                .Tuple 4 1 5 1 l
+;                .Tuple 4 x 6 1 l
+;                .Tuple 5 1 5 1 l
+;                .Tuple 5 a 5 a l
+;                .Tuple 5 x 0 x r
+;                .Tuple 6 x 6 1 l
+;TuplesEnd:      .Tuple 6 a 6 _ l
+
+;replace __11111___ with __aaaaa___
+
 TuplesStart:    .Tuple 0 _ 0 _ r
-TuplesEnd:      .Tuple 0 1 1 2 r
+                .Tuple 0 1 1 a r
+                .Tuple 1 1 1 1 r
+                .Tuple 1 _ 2 _ r
+                .Tuple 2 1 2 1 r
+                .Tuple 2 _ 3 1 l
+                .Tuple 3 1 3 1 l
+                .Tuple 3 _ 3 _ l
+TuplesEnd:      .Tuple 3 a 0 a r
 
 LBracket: .Character '['
 RBracket: .Character ']'
@@ -56,7 +105,8 @@ TupleDoesNotMatch:  addir #5 r2
                     jmpp EndOfProgram ; is address of next tuple > adress of last in list? -> exit program there are no more
                     jmp SearchTuples ; no? search again
 
-Execute:    movrr r2 r9 ; copy pointer to current tuple to r9
+Execute:    ;brk
+            movrr r2 r9 ; copy pointer to current tuple to r9
             addir #2 r9 ; add 2 to current pointer to make it point to NS
             movxr r9 r0 ; move state located at position in r9 into r0 storage of current state
             addir #1 r9 ; add 1 to current pointer to make it point to OC
@@ -67,7 +117,8 @@ Execute:    movrr r2 r9 ; copy pointer to current tuple to r9
 
 PrintTape:  movar TapeStart r8 ; move location of start of tape to r3
             movar TapeEnd r9 ; move location of end of tape to r4
-continue:   cmprr r8 r9 ; compare begin and end of tape
+            printi r0
+continue:   cmprr r9 r8 ; compare begin and end of tape
             jmpn FinishPrint ; if we are finished printing, begin the next iteration
             cmprr r8 r1 ; see if the current iterand in r8 matches the head location on tape in r1
             jmpz PrintBrackets ; if it matches print brackets around this location
