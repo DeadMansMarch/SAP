@@ -38,8 +38,10 @@ class Assembler{
         self.program = Program;
     }
     
-    func Assemble()->[Int]{
+    func Assemble(Location:String)->[Int]{
         var Data = [Int]();
+        let MappingFile = saveFile(withName:"\(Location)/Mapping");
+        let FullDataFile = saveFile(withName:"\(Location)/FullData")
         var startPointer:String = "";
         
         guard let PGRM = self.program else{
@@ -183,16 +185,22 @@ class Assembler{
             
             
         }
-        
+        FullDataFile.write(Data:"Full Maping Table: ");
+        var pointerFile = [Int:String]();
         for (k,v) in pointers{
             if let local = pointerReplicate[k]{
                 for location in local {
                     Data[location] = v;
                 }
+                pointerFile[v] = k;
             }else if startPointer != k{
                 print("Pointer not used : \(k)");
             }
         }
+        
+        let _ = pointerFile.keys.sorted().map{($0,pointerFile[$0])}.forEach({
+            FullDataFile.append(Data:"\t\($0.1!): \($0.0)");
+        })
         
         Data.insert(Data.count, at: 0);
         Data.insert(pointers[startPointer] ?? 0,at:1);
