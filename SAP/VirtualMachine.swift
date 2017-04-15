@@ -288,6 +288,15 @@ class VirtualMachine{
                 }
                 Registers[Params[1]] = Registers[Params[1]] + Registers[Params[0]];
                 break;
+            case 14: //addmr
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] += RAM[Params[0]];
+                break;
             case 15: //addxr
                 guard checkRegister(Params[0]) else{
                     break;
@@ -306,6 +315,36 @@ class VirtualMachine{
                 }
                 Registers[Params[1]] += Params[0];
                 break;
+            case 17: //subrr.
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else {
+                    break;
+                }
+                Registers[Params[1]] -= Registers[Params[0]];
+                break;
+            case 18: //submr
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] -= RAM[Params[0]];
+                break;
+            case 19: //subxr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Registers[Params[0]]) else {
+                break;
+                }
+                Registers[Params[1]] -= RAM[Registers[Params[0]]]
+                break;
             case 20: //mulir
                 guard checkRegister(Params[1]) else{
                     break;
@@ -321,12 +360,118 @@ class VirtualMachine{
                 guard checkRegister(Params[1]) else{
                     break;
                 }
+                Registers[Params[1]] *= Registers[Params[0]];
+                break;
+            case 22: //mulmr
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] *= RAM[Params[1]];
+                break;
+            case 23: //mulxr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Registers[Params[0]]) else {
+                    break;
+                }
+                Registers[Params[1]] *= RAM[Registers[Params[0]]]
+                break;
+            case 24: //divir
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] /= Params[0];
+                break;
+            case 25: //divrr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
                 
-                Registers[Params[1]] = Registers[Params[0]] * Registers[Params[1]];
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] /= Registers[Params[0]];
+                break;
+            case 26: //divmr
+                guard checkMemoryLocation(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                Registers[Params[1]] /= RAM[Params[1]];
+                break;
+            case 27: //divxr
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkRegister(Params[1]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Registers[Params[0]]) else {
+                    break;
+                }
+                Registers[Params[1]] /= RAM[Registers[Params[0]]]
                 break;
             case 28:
                 SpRegisters["PGRM"] = Params[0];
                 break;
+            case 29:
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Params[1]) else {
+                    break;
+                }
+                Registers[Params[0]]-=1;
+                if Registers[Params[0]]==0{
+                    SpRegisters["PGRM"] = Params[1];
+                }
+                break;
+            case 30:
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Params[1]) else {
+                    break;
+                }
+                Registers[Params[0]]-=1;
+                if Registers[Params[0]] != 0{
+                    SpRegisters["PGRM"] = Params[1];
+                }
+                break;
+            case 31:
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Params[1]) else {
+                    break;
+                }
+                Registers[Params[0]]+=1;
+                if Registers[Params[0]]==0{
+                    SpRegisters["PGRM"] = Params[1];
+                }
+                break;
+            case 32:
+                guard checkRegister(Params[0]) else{
+                    break;
+                }
+                guard checkMemoryLocation(Params[1]) else {
+                    break;
+                }
+                Registers[Params[0]]+=1;
+                if Registers[Params[0]] != 0{
+                    SpRegisters["PGRM"] = Params[1];
+                }
+                break;
+
             case 33:
                 guard checkRegister(Params[1]) else{
                     break;
@@ -395,6 +540,9 @@ class VirtualMachine{
                     SpRegisters["PGRM"] = Params[0];
                 }
                 break;
+            //
+            //MISSING CASES 39-43: all stuff to do with stack, will implement when we know how
+            //
             case 44: //outci
                 print(String(Character(UnicodeScalar(Params[0])!)),terminator:"");
                 break;
@@ -410,12 +558,27 @@ class VirtualMachine{
                 }
                 print(Character(UnicodeScalar(RAM[Params[0]])!),terminator:"");
                 break;
+            case 47:
+                guard checkRegister(Params[0]) else {
+                    break;
+                }
+                guard checkRegister(Params[1]) else {
+                    break;
+                }
+                var temp = ""
+                for i in 0..<Params[1]{
+                    temp+="\(String(Character(UnicodeScalar(RAM[Params[0]+i])!)))"
+                }
+                print(temp);
+                break;
+            //case 48 missing becuase I don't know how stulin wants us to do user input / what the error codes would be
             case 49: //printi
                 guard checkRegister(Params[0]) else{
                     break;
                 }
                 print(Registers[Params[0]],terminator:"");
                 break;
+            //case 50-51 missing becuase same reason as 48
             case 52: //brk : Attach debugger process to machine.
                 self.dbkProcess = Debugger(self);
                 break;
@@ -447,6 +610,8 @@ class VirtualMachine{
                 }
                 let Str = RAM[Params[0] + 1...(Params[0] + RAM[Params[0]])]; //Get the string as an array of ints.
                 print(Str.map{String(Character(UnicodeScalar($0)!))}.reduce("",+),terminator:"")
+                break;
+            case 56://nop
                 break;
             case 57: //jumpne
                 if (SpRegisters["CMPR"]! != 1){ //Not equal.
