@@ -38,17 +38,15 @@ class Assembler{
         self.program = Program;
     }
     
-    func Assemble(Location:String)->[Int]{
-        var Data = [Int]();
-        let MappingFile = saveFile(withName:"\(Location)/Mapping");
-        let FullDataFile = saveFile(withName:"\(Location)/FullData")
-        var startPointer:String = "";
-        
+    func Assemble(Location:String,Name:String)->[Int]{
         guard let PGRM = self.program else{
             print("FATAL ASSEMBLY ERROR : No Program Loaded.")
             return [Int]();
         }
-        
+        var Data = [Int]();
+        let MappingFile = saveFile(withName:"\(Location)/Mapping_"+Name);
+        let FullDataFile = saveFile(withName:"\(Location)/FullData_"+Name)
+        var startPointer:String = "";
         let Lines = PGRM.characters.split(separator: "\n").map{String($0)};
         
         for Line in Lines{
@@ -185,7 +183,7 @@ class Assembler{
             
             
         }
-        FullDataFile.write(Data:"Full Maping Table: ");
+        print("\(MappingFile.write(Data:"Full Maping Table: ") ?? "No error in writing mapping file")");
         var pointerFile = [Int:String]();
         for (k,v) in pointers{
             if let local = pointerReplicate[k]{
@@ -199,12 +197,12 @@ class Assembler{
         }
         
         let _ = pointerFile.keys.sorted().map{($0,pointerFile[$0])}.forEach({
-            FullDataFile.append(Data:"\t\($0.1!): \($0.0)");
+            MappingFile.append(Data:"\t\($0.1!): \($0.0)");
         })
         
         Data.insert(Data.count, at: 0);
         Data.insert(pointers[startPointer] ?? 0,at:1);
-        
+        print("\(FullDataFile.write(Data:Data.description) ?? "No error in writing data file")");
         return Data;
     }
 }

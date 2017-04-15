@@ -8,7 +8,7 @@
 
 import Foundation
 
-let PGRMloc = ["/SAP/Programs","/School/Programming/Random/SAP/Programs"]
+let PGRMloc = ["SAP_PROGRAMS","/School/Programming/Random/SAP/Programs"];
 
 var Program:String = "";
 var Location:String = "";
@@ -25,7 +25,7 @@ for i in 0..<PGRMloc.count{
 let Assemble = Assembler();
 Assemble.load(Program:Program);
 print(Location)
-let PGRM = Assemble.Assemble(Location:Location + "/Assembled");
+let PGRM = Assemble.Assemble(Location:Location + "/Assembled",Name:"Turing");
 print(PGRM);
 print();
 var VM = VirtualMachine();
