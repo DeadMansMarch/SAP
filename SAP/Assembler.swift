@@ -21,7 +21,6 @@ extension Character
     }
 }
 
-
 class Assembler{
     let commandListing = VirtualMachine.commandListing;
     
@@ -46,10 +45,13 @@ class Assembler{
         var Data = [Int]();
         let MappingFile = saveFile(withName:"\(Location)/Mapping_"+Name);
         let FullDataFile = saveFile(withName:"\(Location)/FullData_"+Name)
+        let AssociatedDataFile = saveFile(withName:"\(Location)/Associated_"+Name)
         var startPointer:String = "";
         let Lines = PGRM.characters.split(separator: "\n").map{String($0)};
         
-        for Line in Lines{
+        var coalatedLines = [(String,String)]();
+        
+        for Line in Lines {
             let ColonBreaker = Line.characters.split(separator: ":")
             let CInd = ColonBreaker.count - 1;
             let MemoryLocation = Data.count;
@@ -57,7 +59,7 @@ class Assembler{
                 print("Assebler error. Too many colons.");
                 return [Int]()
             }
-            
+            var lineData = "\(Data.count):" //begin with ram location where this line is being inserted
             let Options = String(ColonBreaker[CInd]).characters.split(separator: " ")
                                                     .filter({!$0.isEmpty})
                                                     .map{String($0)};
@@ -66,16 +68,18 @@ class Assembler{
             
             if let cmdInt = commandListing[Command]{
                 Data.append(cmdInt);
+                lineData += " \(cmdInt)"; //if we got a number here, put it next
                 if Options.count > 1{
                     for i in 1...Options.count - 1{ //For each option.
-                    
                         if let asInt = Int(Options[i]){
                             Data.append(asInt)
+                            lineData += " \(asInt)";
                         }else if Options[i].characters.first == "r" && Options[i].characters.count == 2{
                             Data.append(Int(String(Options[i].characters.dropFirst()))!);
-                            print(Data[Data.count - 1]);
+                            lineData += " \(String(Options[i].characters.dropFirst()))"
                         }else if Options[i].characters.first == "#" && i >= 1{
                             Data.append(Int(String(Options[i].characters.dropFirst()))!);
+                            lineData += " \(String(Options[i].characters.dropFirst()))"
                         }else if Options[i].characters.first == ";"{
                             break;
                         }else{
@@ -85,6 +89,7 @@ class Assembler{
                             }else{
                                 pointerReplicate[LOW] = [Data.count];
                             }
+                            lineData += " #\(Data.count)" // append a place holder to be replaced by real pointer
                             Data.append(0); //Append a placeholder to be replaced by the pointer on 2nd pass.
                         }
                     }
@@ -101,6 +106,7 @@ class Assembler{
                             break;
                         }
                         Data.append(Int(String(Options[1].characters.dropFirst()))!)
+                        lineData += "\(String(Options[1].characters.dropFirst()))"
                         break;
                     case ".String":
                         guard Options.count > 1 else{
@@ -117,8 +123,9 @@ class Assembler{
                         
                         let STR = QSplit[1]; //"first of string" "part of quote" "end quote, blank."
                         Data.append(Int(STR.count));
+                        lineData += " \(STR.count)"
                         STR.map(getASCI)
-                            .forEach({Data.append($0)});
+                            .forEach({Data.append($0); lineData += " \($0)";});
                         break;
                     case ".Character":
                         let QSplit = Line.characters.split(separator: "\'");
@@ -127,6 +134,7 @@ class Assembler{
                             return [Int]();
                         }
                         Data.append(getASCI(Char:QSplit[1].first!));
+                        lineData += " \((getASCI(Char:QSplit[1].first!)))"
                     
                     case ".Tuple":
                         print(Options)
@@ -158,7 +166,7 @@ class Assembler{
                         Data.append(OutState); //OutState
                         Data.append(OutChar); //OutChar
                         Data.append(Dir) //OutDir;
-                        
+                        lineData += " \(InState) \(InChar) \(OutState) \(OutChar) \(Dir)"
                         break;
                     case ".Start":
                         print("Start established at location: \(Options[1].lowercased()).")
@@ -180,8 +188,7 @@ class Assembler{
                     pointers[String(ColonBreaker[0]).lowercased()] = MemoryLocation;
                 }
             }
-            
-            
+            coalatedLines.append((lineData,Line));
         }
         print("\(MappingFile.write(Data:"Full Maping Table: ") ?? "No error in writing mapping file")");
         var pointerFile = [Int:String]();
@@ -195,7 +202,25 @@ class Assembler{
                 print("Pointer not used : \(k)");
             }
         }
-        
+        AssociatedDataFile.write(Data: "")
+        for (data,line) in coalatedLines{
+            var tempLine = "";
+            if data.range(of:"#") == nil{
+                tempLine += fit(data,20);
+            } else {
+                var modifiedLine = ""
+                for p in data.characters.split(separator: " "){
+                    if p[p.startIndex] != "#" {
+                        modifiedLine += "\( String(p)) ";
+                    } else {
+                        modifiedLine += "\(Data[Int(String(p.dropFirst()))!]) ";
+                    }
+                }
+                tempLine += fit(modifiedLine,20);
+            }
+            tempLine += fit(line,80);
+            AssociatedDataFile.append(Data:tempLine)
+        }
         let _ = pointerFile.keys.sorted().map{($0,pointerFile[$0])}.forEach({
             MappingFile.append(Data:"\t\($0.1!): \($0.0)");
         })
