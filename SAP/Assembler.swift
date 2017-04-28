@@ -43,9 +43,9 @@ class Assembler{
             return [Int]();
         }
         var Data = [Int]();
-        let MappingFile = saveFile(withName:"\(Location)/Mapping_"+Name);
-        let FullDataFile = saveFile(withName:"\(Location)/FullData_"+Name)
-        let AssociatedDataFile = saveFile(withName:"\(Location)/Associated_"+Name)
+        let MappingFile = saveFile(withName:"\(Location)/\(Name)",FileEnding:".map");
+        let FullDataFile = saveFile(withName:"\(Location)/\(Name)",FileEnding:".bin");
+        let AssociatedDataFile = saveFile(withName:"\(Location)/\(Name)",FileEnding:".lst");
         var startPointer:String = "";
         let Lines = PGRM.characters.split(separator: "\n").map{String($0)};
         

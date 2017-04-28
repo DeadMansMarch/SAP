@@ -12,11 +12,11 @@ class saveFile{
     let Name:String;
     var url:URL;
     
-    init(withName n:String){ //Create a file with path ~/Documents/n.txt, where n can also contain a path.
+    init(withName n:String, FileEnding:String = ".txt"){ //Create a file with path ~/Documents/n.txt, where n can also contain a path.
         self.Name = n;
         let Documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0];
         
-        url = URL.init(fileURLWithPath: "\(Documents.path)/\(n).txt");
+        url = URL.init(fileURLWithPath: "\(Documents.path)/\(n)\(FileEnding)");
     }
     
     init(withUrl u:URL){

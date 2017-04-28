@@ -26,9 +26,9 @@ let Assemble = Assembler();
 Assemble.load(Program:Program);
 print(Location)
 let PGRM = Assemble.Assemble(Location:Location + "/Assembled",Name:"Turing");
-print(PGRM);
-print();
+
 var VM = VirtualMachine();
 
-VM.loadMem(FullMem: PGRM);
+
+VM.loadMem(FileLoc: "\(Location)/Assembled/\("Turing")");
 VM.Execute()

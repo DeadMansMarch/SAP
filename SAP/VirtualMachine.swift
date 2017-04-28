@@ -110,12 +110,22 @@ class VirtualMachine{
     }
     
     func loadMem(FullMem Data:[Int]){
+        print(Data);
         self.setMemoryLength(Length: Data[0]); //Set memory length.
         SpRegisters["PGRM"] = Data[1];               //Set program counter to initial position.
         
         for i in 0..<Data[0]{
             RAM[i] = Data[i + 2];        //Fill Memory.
         }
+    }
+    
+    func loadMem(FileLoc name:String){
+        guard let File = saveFile(withName: name, FileEnding: ".bin").read() else{
+            print("File does not exist.");
+            return;
+        }
+        
+        loadMem(FullMem: File.characters.dropFirst().dropLast().split(separator: ",").map({String($0).trimmingCharacters(in: .whitespaces)}).map{Int($0)!})
     }
     
     func checkRegister(_ rNum:Int)->Bool{
