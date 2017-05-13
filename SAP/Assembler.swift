@@ -179,7 +179,7 @@ class Assembler{
                         break;
                     default:
                         if (Command.characters.first != ";"){
-                            print("This command did not exist.")
+                            print("This command did not exist. \(Command)")
                         }
                         break;
                 }

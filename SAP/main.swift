@@ -22,13 +22,14 @@ for i in 0..<PGRMloc.count{
     }
 }
 
-let Assemble = Assembler();
+let Assemble = AssemblerBetter();
 Assemble.load(Program:Program);
-print(Location)
-let PGRM = Assemble.Assemble(Location:Location + "/Assembled",Name:"Turing");
-print(PGRM);
-print();
-var VM = VirtualMachine();
-
-VM.loadMem(FullMem: PGRM);
-VM.Execute()
+Assemble.assemble()
+//print(Location)
+//let PGRM = Assemble.Assemble(Location:Location + "/Assembled",Name:"Turing");
+//print(PGRM);
+//print();
+//var VM = VirtualMachine();
+//
+//VM.loadMem(FullMem: PGRM);
+//VM.Execute()

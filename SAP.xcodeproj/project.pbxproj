@@ -12,6 +12,8 @@
 		2869D2201E92C138007D273F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D21F1E92C138007D273F /* main.swift */; };
 		2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D2261E92C456007D273F /* VirtualMachine.swift */; };
 		28857CB71E9C754F00E094F5 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28857CB61E9C754F00E094F5 /* Debug.swift */; };
+		961043781EAE642700C0FFF0 /* SimpleAssemblySystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961043771EAE642700C0FFF0 /* SimpleAssemblySystem.swift */; };
+		9624156F1EC0D9D100423F7F /* AssemblerBetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9624156E1EC0D9D100423F7F /* AssemblerBetter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +35,8 @@
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
 		28857CB61E9C754F00E094F5 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
+		961043771EAE642700C0FFF0 /* SimpleAssemblySystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleAssemblySystem.swift; sourceTree = "<group>"; };
+		9624156E1EC0D9D100423F7F /* AssemblerBetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssemblerBetter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,8 +71,10 @@
 			children = (
 				2828B25F1E9340110092FB20 /* saveFile.swift */,
 				2869D21F1E92C138007D273F /* main.swift */,
+				961043771EAE642700C0FFF0 /* SimpleAssemblySystem.swift */,
 				2869D2261E92C456007D273F /* VirtualMachine.swift */,
 				2828B2611E93CE540092FB20 /* Assembler.swift */,
+				9624156E1EC0D9D100423F7F /* AssemblerBetter.swift */,
 				28857CB61E9C754F00E094F5 /* Debug.swift */,
 			);
 			path = SAP;
@@ -133,9 +139,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				28857CB71E9C754F00E094F5 /* Debug.swift in Sources */,
+				9624156F1EC0D9D100423F7F /* AssemblerBetter.swift in Sources */,
 				2828B2621E93CE540092FB20 /* Assembler.swift in Sources */,
 				2869D2201E92C138007D273F /* main.swift in Sources */,
 				2828B2601E9340110092FB20 /* saveFile.swift in Sources */,
+				961043781EAE642700C0FFF0 /* SimpleAssemblySystem.swift in Sources */,
 				2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
