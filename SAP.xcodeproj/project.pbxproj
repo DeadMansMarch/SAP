@@ -11,6 +11,8 @@
 		2828B2621E93CE540092FB20 /* Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2828B2611E93CE540092FB20 /* Assembler.swift */; };
 		2869D2201E92C138007D273F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D21F1E92C138007D273F /* main.swift */; };
 		2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2869D2261E92C456007D273F /* VirtualMachine.swift */; };
+		2880B4551EC7AF1C0092788F /* AssemblerBetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2880B4541EC7AF1C0092788F /* AssemblerBetter.swift */; };
+		2880B4571EC7AF6A0092788F /* SimpleAssembleSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2880B4561EC7AF6A0092788F /* SimpleAssembleSystem.swift */; };
 		28857CB71E9C754F00E094F5 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28857CB61E9C754F00E094F5 /* Debug.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +34,8 @@
 		2869D21C1E92C138007D273F /* SAP */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SAP; sourceTree = BUILT_PRODUCTS_DIR; };
 		2869D21F1E92C138007D273F /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2869D2261E92C456007D273F /* VirtualMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VirtualMachine.swift; sourceTree = "<group>"; };
+		2880B4541EC7AF1C0092788F /* AssemblerBetter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssemblerBetter.swift; sourceTree = "<group>"; };
+		2880B4561EC7AF6A0092788F /* SimpleAssembleSystem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleAssembleSystem.swift; sourceTree = "<group>"; };
 		28857CB61E9C754F00E094F5 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -70,6 +74,8 @@
 				2869D2261E92C456007D273F /* VirtualMachine.swift */,
 				2828B2611E93CE540092FB20 /* Assembler.swift */,
 				28857CB61E9C754F00E094F5 /* Debug.swift */,
+				2880B4541EC7AF1C0092788F /* AssemblerBetter.swift */,
+				2880B4561EC7AF6A0092788F /* SimpleAssembleSystem.swift */,
 			);
 			path = SAP;
 			sourceTree = "<group>";
@@ -136,6 +142,8 @@
 				2828B2621E93CE540092FB20 /* Assembler.swift in Sources */,
 				2869D2201E92C138007D273F /* main.swift in Sources */,
 				2828B2601E9340110092FB20 /* saveFile.swift in Sources */,
+				2880B4551EC7AF1C0092788F /* AssemblerBetter.swift in Sources */,
+				2880B4571EC7AF6A0092788F /* SimpleAssembleSystem.swift in Sources */,
 				2869D2271E92C456007D273F /* VirtualMachine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

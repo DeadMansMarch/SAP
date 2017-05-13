@@ -11,12 +11,13 @@ import Foundation
 class saveFile{
     let Name:String;
     var url:URL;
+    var anl = "\n" //Default to newline for append.
     
-    init(withName n:String, FileEnding:String = ".txt"){ //Create a file with path ~/Documents/n.txt, where n can also contain a path.
+    init(withName n:String, FileEnding:String = ".txt", Documents:Bool=true){ //Create a file with path ~/Documents/n.txt, where n can also contain a path.
         self.Name = n;
-        let Documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0];
+        let Loc = FileManager.default.urls(for: ((Documents==true) ? .documentDirectory : .desktopDirectory), in: .userDomainMask)[0];
         
-        url = URL.init(fileURLWithPath: "\(Documents.path)/\(n)\(FileEnding)");
+        url = URL.init(fileURLWithPath: "\(Loc.path)/\(n)\(FileEnding)");
     }
     
     init(withUrl u:URL){
@@ -34,8 +35,12 @@ class saveFile{
         return nil;
     }
     
+    public func appendDelimit(with:String){
+        self.anl = with;
+    }
+    
     public func append(Data:String)->String?{ //Adds text to the bottom of a file.
-        let dataEnc = ("\n\(Data)").data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        let dataEnc = ("\(anl)\(Data)").data(using: String.Encoding.utf8, allowLossyConversion: false)!
         if !FileManager.default.fileExists(atPath: url.path){
             return self.write(Data:Data);
         }
