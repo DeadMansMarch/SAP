@@ -63,6 +63,11 @@ class Debugger{
         }
     }
     
+    func cmdHelp(){
+        print("Debugger Commands:")
+        
+    }
+    
     func controller(){
         print("\n -Broken into debugger; Control by command- \n")
         while (true){
