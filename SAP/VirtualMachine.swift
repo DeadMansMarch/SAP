@@ -97,6 +97,9 @@ class VirtualMachine{
         56:0,
         57:1]
     
+    private(set) var fName:String = "";
+    private(set) var ST = [String:Int]()
+    private(set) var LST:String = "";
     private(set) var dbkProcess:Debugger? = nil;
     private(set) var RAM = [Int](); //'Memory'.
     private(set) var Registers = [Int](repeating:0,count:10); //Registers.
@@ -104,13 +107,15 @@ class VirtualMachine{
     //                                              ^ 0 = less, 1 = equal, 2 = greater.
     //                                              ^ x < y -> true? x - y is neg. 0 is neg, 2 is pos, 1 is eq.
     
+    func st(_ key:String,_ val:Int){
+        ST[key] = val;
+    }
     
     func setMemoryLength(Length L:Int){ //Resets memory to certain size.
         RAM = [Int](repeating:0,count:L);
     }
     
     func loadMem(FullMem Data:[Int]){
-        print(Data);
         self.setMemoryLength(Length: Data[0]); //Set memory length.
         SpRegisters["PGRM"] = Data[1];               //Set program counter to initial position.
         
@@ -119,7 +124,17 @@ class VirtualMachine{
         }
     }
     
+    func setMem(Location:Int,To:Int){
+        RAM[Location] = To;
+    }
+    
+    func setSPREG(Reg:String, Value:Int){
+        SpRegisters[Reg] = Value;
+    }
+    
     func loadMem(FileLoc name:String){
+        self.fName = name;
+        print("Loading program : fName [\(self.fName)]")
         guard let File = saveFile(withName: name, FileEnding: ".bin").read() else{
             print("File does not exist.");
             return;

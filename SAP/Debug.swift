@@ -41,12 +41,19 @@ extension Dictionary where Value: Equatable {
     }
 }
 
+extension String{
+    func rep(x:String,with:String)->String{
+        return self.replacingOccurrences(of: x, with: with, options: NSString.CompareOptions.literal, range:nil)
+    }
+}
+
 class Debugger{
     let commandListing = VirtualMachine.commandListing;
     let virtualMachine:VirtualMachine;
     
     init(_ with:VirtualMachine){ //This process will assume control of the VM when attached.
         self.virtualMachine = with;
+        loadST();
         controller();
     }
     
@@ -63,12 +70,58 @@ class Debugger{
         }
     }
     
-    func cmdHelp(){
-        print("Debugger Commands:")
+    func loadST(){
+        print(self.virtualMachine.fName)
+        guard let ST = saveFile(withName: self.virtualMachine.fName, FileEnding: ".map").read() else{
+            print("Mapping file not processed.");
+            return;
+        }
         
+        let Splits = ST.rep(x:"\t", with: "").rep(x:": ",with:":").trimmingCharacters(in: .whitespaces)
+        let Listings = Splits.characters.split(separator: "\n");
+        Listings.forEach{
+            let LS = $0.split(separator:":").map{String($0)}
+            if (LS.count > 1){ self.virtualMachine.st(LS[0],Int(LS[1])!); }
+        }
+    }
+    
+    func cmdHelp(){
+        print("Debugger Commands:");
+        print("Note: <address> can be symbolic or numeric");
+        print("\tHelp - Print this menu."); //*
+        print("\tsetbk <address> - set breakpoint at <address>");
+        print("\trmbk <address> - remove breakpoint at <address>");
+        print("\tclrbk - clear all break points");
+        print("\tdisbk - disable all break points");
+        print("\tenbk - enable all break points");
+        print("\tpbk - print all break points");
+        print("\tpreg - print the value of all registers"); //*
+        print("\tareg - print the value of all registers and special registers"); //*
+        print("\twreg <number> <value> - write <value> to register <number>");
+        print("\twpc <value> - write <value> to the program counter");
+        print("\tpmem <start address> <end address> - print memory from <start address> to <end address>");
+        print("\tdeas <start address> <end address> - disassemble program from <start address> to <end address>");
+        print("\twmem <address> <value> - change value of memory address <address> to <value>");
+        print("\tpst - print symbol table");
+        print("\tg - continue program operation");
+        print("\ts - single step"); //*
+        print("\texit - terminate virtual machine"); //*
+    }
+    
+    func sorter(a:(key:String,value:Int), b:(key:String, value:Int))->Bool{
+        return (a.value < b.value);
+    }
+    
+    func addressor(_ Local:Int)->Int{
+        return Local;
+    }
+    
+    func addressor(_ Local:String)->Int{
+        return virtualMachine.ST[Local] ?? -1;
     }
     
     func controller(){
+        cmdHelp();
         print("\n -Broken into debugger; Control by command- \n")
         while (true){
             print("Input Debugger Command: ")
@@ -77,6 +130,21 @@ class Debugger{
                 switch(split[0]){
                     case "exit":
                         return;
+                    case "help":
+                        cmdHelp();
+                        break;
+                    case "pst":
+                        print("Symbol Table: ")
+                        virtualMachine.ST.sorted(by:sorter).forEach({
+                            print("\t\($0.0) : \($0.1)");
+                        })
+                        break;
+                    case "wmem":
+                        if (split.count >= 3){
+                            print("Changed.");
+                            virtualMachine.setMem(Location:addressor(split[1]),To:Int(split[2])!);
+                        }
+                        break;
                     case "preg":
                         print("|  r0  |  r1  |  r2  |  r3  |  r4  |  r5  |  r6  |  r7  |  r8  |  r9  |");
                         for i in 0...9{
@@ -91,7 +159,7 @@ class Debugger{
                     
                         SP.forEach({print("|\(fitI(virtualMachine.SpRegisters[$0]!,4))",terminator:"")})
                         print("|");
-                    case "reg":
+                    case "areg": //Print all registers.
                         let SP = ["PGRM","CMPR","STCK"]
                         SP.forEach({print("|\($0)",terminator:"")});
                         print("|");
@@ -106,7 +174,7 @@ class Debugger{
                         print("|")
                         break;
 
-                    case "stepdown": //Will execute one more command.
+                    case "s": //Will execute one more command.
                         let PGRM = virtualMachine.SpRegisters["PGRM"]!;
                         let command = virtualMachine.RAM[PGRM];
                         let len = virtualMachine.paramList[command] ?? 2;
@@ -118,6 +186,8 @@ class Debugger{
                             print("Program jumped to memory location : \(virtualMachine.SpRegisters["PGRM"]!)");
                         }
                         break;
+                    case "g": //Continue operation.
+                        return;
                     case "steptocommand": //Will excute until reaching a certain command.
                         while(true){
                             let PGRM = virtualMachine.SpRegisters["PGRM"]!;
@@ -142,11 +212,11 @@ class Debugger{
                             print(virtualMachine.RAM[Int(split[1])!...Int(split[2])!].reduce("",{"\($0) \($1)"}))
                         }
                         break;
-                    case "memloc": //Gives the reader a bit of context. Helpful for debugging.
-                        let Len = virtualMachine.RAM.count
+                    case "pmem": //Gives the reader a bit of context. Helpful for debugging.
+                        let Len = Int(split[2])!
                         let PG = virtualMachine.SpRegisters["PGRM"]!;
                         print("Current Program Counter : \(PG)");
-                        for i in 0..<Len{
+                        for i in Int(split[1])!..<Len{
                             if i == PG{
                                 print("[\(virtualMachine.RAM[i])] ",terminator:"");
                             }else{
