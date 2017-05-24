@@ -179,6 +179,14 @@ class VirtualMachine{
         return RAM[l];
     }
     
+    func aPC(Amount:Int){
+        SpRegisters["PGRM"] = Amount;
+    }
+    
+    func wreg(R:Int,Val:Int){
+        Registers[R] = Val;
+    }
+    
     func mPC(Amount:Int)->[Int]{ //Return inputs and move PGRM counter.
         var Options = [Int]();
         let ProgramCounter = SpRegisters["PGRM"]!

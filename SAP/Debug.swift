@@ -112,125 +112,125 @@ class Debugger{
         return (a.value < b.value);
     }
     
-    func addressor(_ Local:Int)->Int{
-        return Local;
+    func addressor(_ Addr:String)->Int{
+        if let Mem = Int(Addr){
+            return Mem;
+        }else{
+            return virtualMachine.ST[Addr] ?? -1;
+        }
     }
     
-    func addressor(_ Local:String)->Int{
-        return virtualMachine.ST[Local] ?? -1;
+    func registrar(_ Addr:String)->Int{
+        if let Mem = Int(Addr){
+            return Mem;
+        }else{
+            return Int(String(Addr.characters.dropFirst())) ?? 0
+        }
     }
     
     func controller(){
         cmdHelp();
         print("\n -Broken into debugger; Control by command- \n")
         while (true){
-            print("Input Debugger Command: ")
+            let PGRM = virtualMachine.SpRegisters["PGRM"]!;
+            print("Sdb (\(PGRM), \(virtualMachine.RAM[PGRM]))> ",terminator:"")
             if let dbI = readLine(){
-                let split = dbI.characters.split(separator: " ").filter({!$0.isEmpty}).map(String.init)
-                switch(split[0]){
-                    case "exit":
-                        return;
-                    case "help":
-                        cmdHelp();
-                        break;
-                    case "pst":
-                        print("Symbol Table: ")
-                        virtualMachine.ST.sorted(by:sorter).forEach({
-                            print("\t\($0.0) : \($0.1)");
-                        })
-                        break;
-                    case "wmem":
-                        if (split.count >= 3){
-                            print("Changed.");
-                            virtualMachine.setMem(Location:addressor(split[1]),To:Int(split[2])!);
-                        }
-                        break;
-                    case "preg":
-                        print("|  r0  |  r1  |  r2  |  r3  |  r4  |  r5  |  r6  |  r7  |  r8  |  r9  |");
-                        for i in 0...9{
-                            print("|\(fitI(virtualMachine.Registers[i],6,right:true))",terminator:"");
-                        }
-                        print("|")
-                        break;
-                    case "spreg":
-                        let SP = ["PGRM","CMPR","STCK"]
-                        SP.forEach({print("|\($0)",terminator:"")});
-                        print("|");
+                cmdSwitch(dbI:dbI);
+            }
+        }
+    }
+    
+    func cmdSwitch(dbI:String){
+        let split = dbI.characters.split(separator: " ").filter({!$0.isEmpty}).map(String.init)
+        guard split.count > 0 else{
+            print("Empty line.");
+            return;
+        }
+        switch(split[0]){
+        case "exit":
+            return;
+        case "help":
+            cmdHelp();
+            break;
+        case "pst":
+            print("Symbol Table: ")
+            virtualMachine.ST.sorted(by:sorter).forEach({
+                print("\t\($0.0) : \($0.1)");
+            })
+            break;
+        case "wmem":
+            if (split.count >= 3){
+                print("Changed.");
+                let Mem:Int;
+                if let M = Int(split[1]){
+                    Mem = M;
+                }else{
+                    Mem = virtualMachine.ST[split[1]] ?? -1;
+                }
+                virtualMachine.setMem(Location:Mem,To:Int(split[2])!);
+            }
+            break;
+        case "preg":
+            
+            for i in 0...9{
+                print("r\(i): ",terminator:"");
+                print(virtualMachine.Registers[i])
+            }
+            
+            break;
+        case "spreg":
+            let SP = ["PGRM","CMPR","STCK"]
+            SP.forEach({
+                print("\($0): ",terminator:"");
+                print(virtualMachine.SpRegisters[$0]!)
+            });
+        case "areg": //Print all registers.
+            cmdSwitch(dbI:"spreg")
+            cmdSwitch(dbI:"preg")
+            break;
+        case "s": //Will execute one more command.
+            let PGRM = virtualMachine.SpRegisters["PGRM"]!;
+            let command = virtualMachine.RAM[PGRM];
+            if command == 52{ let _ = virtualMachine.mPC(Amount:0); break }
+            let _ = virtualMachine.cmdSwitch(With:command);
+            break;
+        case "g": //Continue operation.
+            return;
+        case "nextc":
+            printCommand(virtualMachine.SpRegisters["PGRM"]!);
+            break;
+        case "printmem":
+            if split.count == 1{
+                print(virtualMachine.RAM.reduce("",{"\($0) \($1)"}))
+            }else if split.count == 2{
+                print(virtualMachine.RAM[Int(split[1])!]);
+            }else{
+                print(virtualMachine.RAM[Int(split[1])!...Int(split[2])!].reduce("",{"\($0) \($1)"}))
+            }
+            break;
+        case "wreg":
+            virtualMachine.wreg(R:registrar(split[1]),Val:Int(split[2])!)
+            break;
+        case "wpc":
+            virtualMachine.aPC(Amount: Int(split[1])!)
+            break;
+        case "pmem": //Gives the reader a bit of context. Helpful for debugging.
+            let Len = addressor(split[2])
+            let PG = virtualMachine.SpRegisters["PGRM"]!;
+            print("Current Program Counter : \(PG)");
+            for i in addressor(split[1])..<Len{
+                print("\(i): ",terminator:"");
+                if i == PG{
+                    print("[\(virtualMachine.RAM[i])] ");
+                }else{
+                    print("\(virtualMachine.RAM[i]) ");
                     
-                        SP.forEach({print("|\(fitI(virtualMachine.SpRegisters[$0]!,4))",terminator:"")})
-                        print("|");
-                    case "areg": //Print all registers.
-                        let SP = ["PGRM","CMPR","STCK"]
-                        SP.forEach({print("|\($0)",terminator:"")});
-                        print("|");
-                        
-                        SP.forEach({print("|\(fitI(virtualMachine.SpRegisters[$0]!,4))",terminator:"")})
-                        print("|");
-                        print("");
-                        print("|  r0  |  r1  |  r2  |  r3  |  r4  |  r5  |  r6  |  r7  |  r8  |  r9  |");
-                        for i in 0...9{
-                            print("|\(fitI(virtualMachine.Registers[i],6,right:true))",terminator:"");
-                        }
-                        print("|")
-                        break;
-
-                    case "s": //Will execute one more command.
-                        let PGRM = virtualMachine.SpRegisters["PGRM"]!;
-                        let command = virtualMachine.RAM[PGRM];
-                        let len = virtualMachine.paramList[command] ?? 2;
-                        printCommand(PGRM,"Running: ");
-                        if command == 52{ let _ = virtualMachine.mPC(Amount:0); break }
-                        virtualMachine.cmdSwitch(With:command);
-                        printCommand(virtualMachine.SpRegisters["PGRM"]!,"Next: ");
-                        if (virtualMachine.SpRegisters["PGRM"] != PGRM + len + 1){
-                            print("Program jumped to memory location : \(virtualMachine.SpRegisters["PGRM"]!)");
-                        }
-                        break;
-                    case "g": //Continue operation.
-                        return;
-                    case "steptocommand": //Will excute until reaching a certain command.
-                        while(true){
-                            let PGRM = virtualMachine.SpRegisters["PGRM"]!;
-                            let command = virtualMachine.RAM[PGRM];
-                            let len = virtualMachine.paramList[command] ?? 2;
-                            printCommand(PGRM);
-                            if commandListing.firstKey(forValue: command) == split[1]{
-                                break;
-                            }else{
-                                virtualMachine.cmdSwitch(With: command);
-                            }
-                        }
-                    case "nextc":
-                        printCommand(virtualMachine.SpRegisters["PGRM"]!);
-                        break;
-                    case "printmem":
-                        if split.count == 1{
-                            print(virtualMachine.RAM.reduce("",{"\($0) \($1)"}))
-                        }else if split.count == 2{
-                            print(virtualMachine.RAM[Int(split[1])!]);
-                        }else{
-                            print(virtualMachine.RAM[Int(split[1])!...Int(split[2])!].reduce("",{"\($0) \($1)"}))
-                        }
-                        break;
-                    case "pmem": //Gives the reader a bit of context. Helpful for debugging.
-                        let Len = Int(split[2])!
-                        let PG = virtualMachine.SpRegisters["PGRM"]!;
-                        print("Current Program Counter : \(PG)");
-                        for i in Int(split[1])!..<Len{
-                            if i == PG{
-                                print("[\(virtualMachine.RAM[i])] ",terminator:"");
-                            }else{
-                                print("\(virtualMachine.RAM[i]) ",terminator:"");
-
-                            }
-                        }
-                        print("")
-                        break;
-                    default:
-                        print("No such debugger command.");
-                        break;
                 }
             }
+            break;
+        default:
+            print("No such debugger command.");
+            break;
         }
     }
     
