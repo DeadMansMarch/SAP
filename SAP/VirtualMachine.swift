@@ -107,6 +107,9 @@ class VirtualMachine{
     //                                              ^ 0 = less, 1 = equal, 2 = greater.
     //                                              ^ x < y -> true? x - y is neg. 0 is neg, 2 is pos, 1 is eq.
     
+    public var breakPointAccrd = [Int](); //The VM needs to know what the breakpoint replaced.
+    public var Accord = false;
+    
     func st(_ key:String,_ val:Int){
         ST[key] = val;
     }
@@ -162,6 +165,7 @@ class VirtualMachine{
     func Execute(){ //Executes the full program.
         print("Starting program.");
         print("RUN:")
+        self.dbkProcess = Debugger(self);
         while true{
             let ProgramCounter = SpRegisters["PGRM"]!;
             let Command = RAM[ProgramCounter];
@@ -187,37 +191,65 @@ class VirtualMachine{
         Registers[R] = Val;
     }
     
+    func paramList(With C:Int)->Int{
+        if (Accord){
+            return self.breakPointAccrd.count - 1; //One command, x inputs, x+1 length.
+        }else{
+            return self.paramList[C] ?? 2;
+        }
+    }
+    
     func mPC(Amount:Int)->[Int]{ //Return inputs and move PGRM counter.
         var Options = [Int]();
-        let ProgramCounter = SpRegisters["PGRM"]!
-        guard ProgramCounter <= RAM.count else{
-            print("OVERFLOW ERROR");
-            return [Int]();
-        }
-        if Amount > 0{
-            for i in 1...Amount{
-                Options.append(getValue(for:ProgramCounter + i));
+        if (!Accord){
+            
+            let ProgramCounter = SpRegisters["PGRM"]!
+            guard ProgramCounter <= RAM.count else{
+                print("OVERFLOW ERROR");
+                return [Int]();
             }
+            if Amount > 0{
+                for i in 1...Amount{
+                    Options.append(getValue(for:ProgramCounter + i));
+                }
+            }
+            SpRegisters["PGRM"] = ProgramCounter + Amount + 1;
+            return Options;
+        }else{
+            SpRegisters["PGRM"]! += breakPointAccrd.count - 1;
+            Accord = false;
+            return (1 ... breakPointAccrd.count - 1).count > 0 ? Array(breakPointAccrd[(1 ... breakPointAccrd.count - 1)]) : Options
         }
-        SpRegisters["PGRM"] = ProgramCounter + Amount + 1;
-        return Options;
+    }
+    
+    func PassRAM(Location:Int)->Int{
+        if (Accord && (Location == self.SpRegisters["PGRM"]! || Location < self.SpRegisters["PGRM"]! + breakPointAccrd.count)){
+            return breakPointAccrd[Location - self.SpRegisters["PGRM"]!];
+        }else{
+            return RAM[Location];
+        }
     }
     
     func cmdSwitch(With c:Int)->Bool{ //Get command from Int.
-        if c == 0{
+        var C = c;
+        if (Accord){
+            C = breakPointAccrd[0];
+        }
+        if C == 0{
             print("END OF PROGRAM")
             return false;
         }
         
-        guard c > 0 && c <= 57 else{
+        guard C > 0 && C <= 57 else{
             print("FATAL ERROR: COMMAND NOT RECOGNIZED");
             return false;
         }
         
-        let nParam = paramList[c] ?? 2;
+        let nParam = paramList(With:C);
         
         let Params = mPC(Amount:nParam);
-        switch(c){
+        Accord = false;
+        switch(C){
             case 1: //clrr
                 guard checkRegister(Params[0]) else{
                     break;
@@ -613,7 +645,7 @@ class VirtualMachine{
                 break;
             //case 50-51 missing becuase same reason as 48
             case 52: //brk : Attach debugger process to machine.
-                self.dbkProcess = Debugger(self);
+                self.dbkProcess?.controller();
                 break;
             case 53: //movrx
                 guard checkRegister(Params[0]) else{
@@ -652,7 +684,7 @@ class VirtualMachine{
                 }
                 break;
             default:
-                print("\(c) : Not found in listings.");
+                print("\(C) : Not found in listings.");
                 break;
         }
         return true;

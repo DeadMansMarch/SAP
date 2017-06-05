@@ -50,11 +50,63 @@ extension String{
 class Debugger{
     let commandListing = VirtualMachine.commandListing;
     let virtualMachine:VirtualMachine;
+    var PointData = [Int:[Int]]();
+    var PointsActive = [Int:Bool]();
+    
     
     init(_ with:VirtualMachine){ //This process will assume control of the VM when attached.
         self.virtualMachine = with;
         loadST();
         controller();
+    }
+    
+    func pointInit(Locale:String)->Bool{
+        let Location = addressor(Locale);
+        
+        let oCmd = virtualMachine.getValue(for: Location);
+        
+        guard oCmd < VirtualMachine.commandListing.count && oCmd >= 0 else{
+            print("NOT A VALID LINE POINT");
+            return false
+        }
+        
+        let cmdLength:Int = virtualMachine.paramList(With: oCmd);
+        PointData[Location] = Array(virtualMachine.RAM[Location...(Location + cmdLength)]);
+        return true;
+    }
+    
+    func pointRemove(Locale:String){
+        let Location = addressor(Locale);
+        let _ = pointActivate(Locale: Locale, Active: false);
+        PointsActive.removeValue(forKey: Location);
+        PointData.removeValue(forKey: Location);
+    }
+    
+    func pointActivate(Locale:String,Active:Bool=true)->Bool{
+        let Location = addressor(Locale);
+        
+        guard let Point = PointData[Location] else{
+            print("No such breakpoint.");
+            return false;
+        }
+        
+        self.PointsActive[Location] = Active;
+        print("\(Location) \(self.PointsActive[Location])");
+        if (Active){
+            virtualMachine.setMem(Location: Location, To: 52);
+            for i in 1..<Point.count{
+                virtualMachine.setMem(Location: i + Location, To:56);
+            }
+            
+        }else{
+            print("Deactivate");
+            for i in 0..<Point.count{
+                virtualMachine.setMem(Location: i + Location, To:Point[i]);
+            }
+        }
+        
+        
+        return true;
     }
     
     func printCommand(_ PGRM:Int, _ Message:String = ""){
@@ -116,7 +168,9 @@ class Debugger{
         if let Mem = Int(Addr){
             return Mem;
         }else{
-            return virtualMachine.ST[Addr] ?? -1;
+            let Get = virtualMachine.ST[Addr];
+            if (Get == nil){ print("No such symbol : \(Addr)"); }
+            return Get ?? -1;
         }
     }
     
@@ -133,24 +187,58 @@ class Debugger{
         print("\n -Broken into debugger; Control by command- \n")
         while (true){
             let PGRM = virtualMachine.SpRegisters["PGRM"]!;
+            print(PointsActive);
+            if let Actor = PointsActive[PGRM - 1]{ //Basically, the prebreaks are all pulled from the program. This puts them back.
+                print("According");
+                if (Actor){
+                    virtualMachine.breakPointAccrd = PointData[PGRM - 1]!;
+                    virtualMachine.Accord = true;
+                }
+            }
             print("Sdb (\(PGRM), \(virtualMachine.RAM[PGRM]))> ",terminator:"")
             if let dbI = readLine(){
-                cmdSwitch(dbI:dbI);
+                if (!cmdSwitch(dbI: dbI)){
+                    break;
+                }
             }
         }
     }
     
-    func cmdSwitch(dbI:String){
+    func cmdSwitch(dbI:String)->Bool{
         let split = dbI.characters.split(separator: " ").filter({!$0.isEmpty}).map(String.init)
         guard split.count > 0 else{
             print("Empty line.");
-            return;
+            return true;
         }
         switch(split[0]){
         case "exit":
-            return;
+            return false;
         case "help":
             cmdHelp();
+            break;
+        case "setbk":
+            if (pointInit(Locale:split[1])){
+                if (pointActivate(Locale: split[1])){
+                    print("Breakpoint set.");
+                }else{
+                    print("Error during point activation.");
+                }
+            }else{
+                print("Error during point init.");
+            }
+            break;
+        case "rmbk":
+            pointRemove(Locale: split[1]);
+            break;
+        case "disbk":
+            let _ = PointsActive.forEach({pointActivate(Locale: String(describing:$0.key), Active: false)})
+            break;
+        case "enbk":
+            let _ = PointsActive.forEach({pointActivate(Locale: String(describing:$0.key), Active: true)})
+            break;
+        case "pbk":
+            PointsActive.forEach({print(($1) ? "(\($0))" : "\($0) ",terminator:"")});
+            print("");
             break;
         case "pst":
             print("Symbol Table: ")
@@ -189,13 +277,14 @@ class Debugger{
             cmdSwitch(dbI:"preg")
             break;
         case "s": //Will execute one more command.
+            print("Stepping - \(virtualMachine.Accord)");
             let PGRM = virtualMachine.SpRegisters["PGRM"]!;
-            let command = virtualMachine.RAM[PGRM];
+            let command = virtualMachine.PassRAM(Location: PGRM);
             if command == 52{ let _ = virtualMachine.mPC(Amount:0); break }
             let _ = virtualMachine.cmdSwitch(With:command);
             break;
         case "g": //Continue operation.
-            return;
+            return false;
         case "nextc":
             printCommand(virtualMachine.SpRegisters["PGRM"]!);
             break;
@@ -232,6 +321,8 @@ class Debugger{
             print("No such debugger command.");
             break;
         }
+        
+        return true;
     }
     
 }
