@@ -10,7 +10,6 @@ import Foundation
 
 
 class VirtualMachine{
-    //Dis rih here a virtual machene.
     
     public static let commandListing = [
         "halt":0,
@@ -97,6 +96,7 @@ class VirtualMachine{
         56:0,
         57:1]
     
+    private(set) var STACK = [Int](repeating:0,count:400);
     private(set) var fName:String = "";
     private(set) var ST = [String:Int]()
     private(set) var LST:String = "";
@@ -109,6 +109,30 @@ class VirtualMachine{
     
     public var breakPointAccrd = [Int](); //The VM needs to know what the breakpoint replaced.
     public var Accord = false;
+    
+    func verify()->Bool{
+        let SP = SpRegisters["STCK"]!;
+        return SP < STACK.count && SP >= 0;
+    }
+    
+    func pop()->Int{
+        guard verify() else{
+            print("STACK UNDERFLOW");
+            return 0;
+        }
+        SpRegisters["STCK"]! -= 1;
+        
+        return STACK[SpRegisters["STCK"]! + 1];
+    }
+    
+    func push(Val:Int){
+        SpRegisters["STCK"]! += 1;
+        guard verify() else{
+            print("STACK OVERFLOW");
+            return;
+        }
+        STACK[SpRegisters["STCK"]!] = Val;
+    }
     
     func st(_ key:String,_ val:Int){
         ST[key] = val;
@@ -605,9 +629,29 @@ class VirtualMachine{
                     SpRegisters["PGRM"] = Params[0];
                 }
                 break;
-            //
-            //MISSING CASES 39-43: all stuff to do with stack, will implement when we know how
-            //
+            case 39://jsr
+                push(Val:SpRegisters["PGRM"]!);
+                
+                for i in 0...5{
+                    push(Val:Registers[i]);
+                }
+                break
+            case 40: //ret
+                push(Val:SpRegisters["PGRM"]!);
+                
+                for i in (0...5).reversed(){
+                    Registers[i] = pop();
+                }
+                SpRegisters["PGRM"] = pop();
+                break
+            case 41: //push
+                push(Val:Params[1]);
+                break;
+            case 42: //pop
+                Registers[Params[1]] = pop();
+                break;
+            case 43: //stackc
+                break;
             case 44: //outci
                 print(String(Character(UnicodeScalar(Params[0])!)),terminator:"");
                 break;

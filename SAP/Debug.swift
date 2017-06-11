@@ -174,6 +174,15 @@ class Debugger{
         }
     }
     
+    func getLabel(_ Addr:Int)->String?{
+        for a in virtualMachine.ST{
+            if (a.value == (Addr)){
+                return a.key;
+            }
+        }
+        return nil;
+    }
+    
     func registrar(_ Addr:String)->Int{
         if let Mem = Int(Addr){
             return Mem;
@@ -258,6 +267,56 @@ class Debugger{
                 virtualMachine.setMem(Location:Mem,To:Int(split[2])!);
             }
             break;
+        case "deas":
+            guard (split.count >= 3) else {
+                break;
+            }
+            let start = addressor(split[1]);
+            let end = addressor(split[2]);
+            
+            var Lines = [String]();
+            
+            var WAIT = 0;
+            var STARTOFFSET = 0;
+            for i in start..<end{
+                var Line = "";
+                
+                let In = virtualMachine.RAM[i];
+                
+                guard (i >= WAIT) else{
+                    continue;
+                }
+                
+                let Num = commandInputs[In]!;
+                WAIT = i + Num.count + 1;
+                let Label = getLabel(i);
+                let Labeldef = "\(Label ?? ""): ";
+                if (Label != nil){
+                    Line += Labeldef;
+                    STARTOFFSET = Labeldef.characters.count;
+                }else{
+                    Line += fit("",STARTOFFSET);
+                }
+                
+                let CommandName = String(String(describing:Instructions(rawValue:In)).characters.split(separator:".")[2].dropLast());
+                Line = "\(Line)\(CommandName)";
+                
+                for k in 0..<Num.count{
+                    switch(Num[k]){
+                    case TokenType.Label:
+                        Line = "\(Line) \(getLabel(virtualMachine.RAM[i + k + 1]) ?? "Label error")"
+                    case TokenType.Register:
+                        Line = "\(Line) r\(virtualMachine.RAM[i + k + 1])";
+                    default:
+                        break;
+                    }
+                }
+                print(Line);
+                
+                Lines.append(Line);
+            }
+            break;
+            
         case "preg":
             
             for i in 0...9{
