@@ -23,7 +23,9 @@ for i in 0..<PGRMloc.count{
 }
 
 let Assemble = AssemblerBetter();
-Assemble.load(Program:Program);
+//Assemble.load(Program:Program);
+Assemble.Location = ""
+Assemble.Name = "Turing"
 Assemble.assemble()
 //print(Location)
 //let PGRM = Assemble.Assemble(Location:Location + "/Assembled",Name:"Turing");
