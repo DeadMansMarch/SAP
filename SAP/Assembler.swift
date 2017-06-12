@@ -47,9 +47,13 @@ class Assembler{
             print("Program not loaded.");
             return [Int]()
         }
+        guard PGRM != "" else{
+            print("Program not loaded.");
+            return [Int]()
+        }
         
         var BIN = [Int]();
-        let FullLocation = "\(Location)/\(Name)";                               //Location of all assembler files.
+        let FullLocation = "\(Location)/Assembled/\(Name)";                               //Location of all assembler files.
         let Mapping = saveFile(withName:FullLocation,FileEnding:".map");        //
         let Binaries = saveFile(withName:FullLocation,FileEnding:".bin");       //
         let Associations = saveFile(withName:FullLocation,FileEnding:".lst");
@@ -57,9 +61,11 @@ class Assembler{
         let Lines = split(PGRM, By:"\n").map{String($0)};
         var AssociatedLines = [(String,String)]();
         var START:String = "NOSTART";
-       
+        
         
         for Line in Lines { //Go through each line.
+            print(Line);
+            if (Line.characters.first == ";"){ continue; }
             let ColonBreaker = Line.characters.split(separator: ":")
             let CInd = ColonBreaker.count - 1;
             let MemoryLocation = BIN.count;
@@ -150,7 +156,7 @@ class Assembler{
                             print("Tuple length invalid.");
                             return [Int]();
                         }
-                        guard let InState = Int(String(Options[1])) else{
+                        guard let InState = Int(String(Options[1].characters.dropFirst())) else{
                             print("InState is not a valid number.");
                             return [Int]();
                         }
@@ -163,11 +169,13 @@ class Assembler{
                         }
                         
                         let OutChar = Assembler.getASCI(Char:Options[4].characters.first!)
-                        guard Options[5]=="r" || Options[5]=="l" else {
+                        let Direction = String(Options[5].characters.dropLast());
+                        guard Direction=="r" || Direction=="l" else {
                             print("Direction is not \'l\' or \'r\'")
                             return [Int]();
                         }
-                        let Dir = (String(Options[5]) == "l") ? -1 : 1; //If not l, it will be r.
+                        print(String(Options[5].characters.dropLast()))
+                        let Dir = (String(Options[5].characters.dropLast()) == "l") ? -1 : 1; //If not l, it will be r.
                         
                         BIN.append(InState); //Input State
                         BIN.append(InChar); //InChar
@@ -196,6 +204,7 @@ class Assembler{
                     mapping[String(ColonBreaker[0]).lowercased()] = MemoryLocation;
                 }
             }
+            print("Adding");
             AssociatedLines.append((lineData,Line));
         }
         print("\(Mapping.write(Data:"Full Maping Table: ") ?? "No error in writing mapping file")");
@@ -211,6 +220,8 @@ class Assembler{
             }
         }
         Associations.write(Data: "")
+        print("BLNK")
+        print(AssociatedLines);
         for (data,line) in AssociatedLines{
             var tempLine = "";
             if data.range(of:"#") == nil{
@@ -227,7 +238,9 @@ class Assembler{
                 tempLine += fit(modifiedLine,20);
             }
             tempLine += fit(line,80);
-            Associations.append(Data:tempLine)
+            
+            Associations.append(Data: tempLine)
+            print("Appending \(tempLine)");
         }
         let _ = pointerFile.keys.sorted().map{($0,pointerFile[$0])}.forEach({
             Mapping.append(Data:"\t\($0.1!): \($0.0)");

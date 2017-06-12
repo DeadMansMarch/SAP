@@ -145,7 +145,7 @@ class VirtualMachine{
     func loadMem(FullMem Data:[Int]){
         self.setMemoryLength(Length: Data[0]); //Set memory length.
         SpRegisters["PGRM"] = Data[1];               //Set program counter to initial position.
-        
+        print(Data.count);
         for i in 0..<Data[0]{
             RAM[i] = Data[i + 2];        //Fill Memory.
         }

@@ -56,6 +56,13 @@ func switcher(Split:[String])->Bool{
                 case 2:
                     print("Assembling with file path : \(Directory)/\(File).txt");
                     let Assemble = Assembler();
+                    print("Assembling");
+                    
+                    if let toLoad = saveFile(withName:"\(Directory)/\(File)").read(){
+                        Assemble.load(Program:toLoad);
+                    }else{
+                    }
+                    
                     Assemble.Assemble(Location:Directory,Name:File);
                     print("Assembled using Non-Tokenizing Assembler.");
                     break

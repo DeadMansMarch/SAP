@@ -284,10 +284,11 @@ class AssemblerBetter{
             return
         }
         let FullLocation = "\(Location!)/\(Name!)";
+        let OutputLocation = "\(Location!)/Assembled/\(Name!)"
         let Program = saveFile(withName:FullLocation,FileEnding:".txt");        //Location of all assembler files.
-        let Mapping = saveFile(withName:FullLocation,FileEnding:".map");        //
-        let Binaries = saveFile(withName:FullLocation,FileEnding:".bin");       //
-        let Associations = saveFile(withName:FullLocation,FileEnding:".lst");   //
+        let Mapping = saveFile(withName:OutputLocation,FileEnding:".map");        //
+        let Binaries = saveFile(withName:OutputLocation,FileEnding:".bin");       //
+        let Associations = saveFile(withName:OutputLocation,FileEnding:".lst");   //
         guard let program = Program.read() else {
             print("Cannot assemble: cannot access program")
             return
@@ -537,7 +538,8 @@ class AssemblerBetter{
             Associations.append(Data:associatedLine)
         }
         Mapping.write(Data:labels.reduce(""){$0+"\n\($1.0) : \($1.1)"})
-        Binaries.write(Data:numbers.joined().reduce(""){$0+"\n\($1)"})
+        print("\([numbers.joined().count]+numbers.joined())")
+        Binaries.write(Data:"\([numbers.joined().count]+numbers.joined())")
         
     }
     private func tokenLine(_ line:String)->[Token]{
