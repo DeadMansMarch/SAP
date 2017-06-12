@@ -521,7 +521,7 @@ class AssemblerBetter{
                 pos += 1
                 if labelFix[pos] != nil{
                     if let ll = labels[labelFix[pos]!]{
-                        numbers[i][j]=ll
+                        numbers[i][j]=ll-1
                     }
                 }
             }
@@ -539,7 +539,7 @@ class AssemblerBetter{
         }
         Mapping.write(Data:labels.reduce(""){$0+"\n\($1.0) : \($1.1)"})
         print("\([numbers.joined().count]+numbers.joined())")
-        Binaries.write(Data:"\([numbers.joined().count]+numbers.joined())")
+        Binaries.write(Data:"\([numbers.joined().count]+numbers.joined()+[0,0,0,0,0,0])")
         
     }
     private func tokenLine(_ line:String)->[Token]{

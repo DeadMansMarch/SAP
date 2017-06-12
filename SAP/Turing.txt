@@ -82,7 +82,7 @@ TuplesStart:    .Tuple \0 _ 0 _ r\
                 .Tuple \15 1 15 1 r\
 TuplesEnd:      .Tuple \15 P 15 _ r\
 
-TapeStart: .String "__11_11111_________________________"
+TapeStart: .String "__111_111_________________________________________________________________________________________________________________________"
 TapeEnd: nop ;nothing at this pointer, just to give address for end of tape
 
 Setup:  movmr StartState r0     ; initialize r0 as current state by putting in starting state
