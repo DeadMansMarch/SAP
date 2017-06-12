@@ -204,7 +204,7 @@ class Debugger{
                     virtualMachine.Accord = true;
                 }
             }
-            print("Sdb (\(PGRM), \(virtualMachine.RAM[PGRM]))> ",terminator:"")
+            //print("Sdb (\(PGRM), \(virtualMachine.RAM[PGRM]))> ",terminator:"")
             if let dbI = readLine(){
                 if (!cmdSwitch(dbI: dbI)){
                     break;
