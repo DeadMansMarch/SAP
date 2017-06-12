@@ -38,13 +38,13 @@ func switcher(Split:[String])->Bool{
             print("\t[1] : Tokenizing Assembler");
             print("\t[2] : Non-Tokenizing Assembler");
             print("Assembler >",terminator:"");
-            if let Assembler = Int(readLine() ?? ""){
+            if let AssembleNum = Int(readLine() ?? ""){
                 guard Split.count > 1 else{
                     print("No file given.");
                     break;
                 }
                 let File = Split[1];
-                switch(Assembler){
+                switch(AssembleNum){
                 case 1:
                     print("Assembling with file path : \(Directory)/\(File).txt");
                     let Assemble = AssemblerBetter();
@@ -54,6 +54,17 @@ func switcher(Split:[String])->Bool{
                     print("Assembled using Tokenizing Assembler.");
                     break;
                 case 2:
+                    print("Assembling with file path : \(Directory)/\(File).txt");
+                    let Assemble = Assembler();
+                    print("Assembling");
+                    
+                    if let toLoad = saveFile(withName:"\(Directory)/\(File)").read(){
+                        Assemble.load(Program:toLoad);
+                    }else{
+                    }
+                    
+                    Assemble.Assemble(Location:Directory,Name:File);
+                    print("Assembled using Non-Tokenizing Assembler.");
                     break
                 default:
                     break;
